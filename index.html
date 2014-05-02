@@ -1,0 +1,3207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+  <!--<link href="style.css" rel="stylesheet" type="text/css">-->
+  <link href="bootstrap/css/bootstrap.css" rel="stylesheet" media="screen">
+
+
+  </head>
+
+
+  <body>
+    
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="http://d3js.org/topojson.v0.min.js"></script>
+<script src="http://d3js.org/d3.geo.projection.v0.min.js"></script>
+<script src="http://d3js.org/d3.geo.tile.v0.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.0.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<!---<script type="text/javascript" src="../Tobi Work/jQuery.Survey-master/JQuery.Survey.js"></script>
+
+
+
+<!--<script type="text/javascript" src="handlebars.js"></script>
+
+<script type="text/javascript" src="jquery.validate.js"></script>
+<script src="https://raw.github.com/jdarling/jQuery.Survey/master/jQuery.Survey.js"></script>
+<script src="http://code.jquery.com/jquery.Survey.js"></script>-->
+
+
+<script type="text/javascript">
+
+
+    var bodyWidth = $(document).width()
+    var bodyHeight = $(document).height()
+    var center = $(document).width() / 2
+    var middle = $(document).height() / 200
+
+    var textWidth = 800
+    var text_offset_top = 60
+    var title_offset_top = 70
+
+    // left and top values for individual questions
+    var question_lnum = center - 120;
+    var string_l = question_lnum.toString();
+    var string_t = "30%";
+
+    var timebar_margin = 10,
+        timebar_label_margin = 3,
+        bar_target_height = 100,
+        bar_target_width = ((bodyWidth - (timebar_margin * 4) - 20) / 5),
+        bar4_target_width = ((bodyWidth - (timebar_margin * 3) - 20) / 4),
+        bar_label_height = 25,
+        timebar_offset_x = 10,
+        timebar_offset_y = bodyHeight - bar_target_height - 5;
+
+
+    var currSlide = 1;
+    var numFriends = 0;
+    var askedAbout = 0;
+    var checked = false;
+    var skipped = false;
+    var currNode = null,
+        haveFriends = document.getElementById("haveBlackFriends"),
+        friendFriends = document.getElementById("friendsBlackFriends"),
+        knowFriends = document.getElementById("knowBlackFriends");
+
+    var curr_friend_x = 200,
+        curr_friend_y = 200,
+        q_window_width = 100,
+        q_window_height = 100;
+
+    var nodeColor = '#9CD4D4',
+        femaleColor = '#DD006D',
+        maleColor = '#0066CC',
+        whiteColor = '#FFCC00',
+        asianColor = '#FF5050',
+        blackColor = '#4747D1',
+        hispanicColor = '#009900',
+        otherRaceColor = '#990099';
+
+    var startTime,
+      endTime;
+
+
+
+    $('.nav-tabs').button()
+
+  var svg = d3.select("body").append("svg")
+    .attr("width", bodyWidth)
+    .attr("height", bodyHeight);
+    //.on("click", addFriend); // For testing purposes only
+
+  var force = d3.layout.force()
+    .size([bodyWidth, bodyHeight])
+    .nodes([{x:bodyWidth / 2, y:bodyHeight / 2 + 55, fixed: true, name:"You", id:0, gender:"", race:"", edu:null, freq:null}]) // initialize with a single node
+    .linkDistance(100)
+    .charge(-1500)
+    .on("tick", tick);
+
+  var nodes = force.nodes(),
+      links = force.links(),
+      node = svg.selectAll(".node"),
+      link = svg.selectAll(".link");
+
+
+// Slide 1
+
+  var slide_1 = d3.select("svg").append("g")
+    .attr("id", "slide1")
+    slide_1.append("rect")
+      .style("fill", "white")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_1.append("text")
+      .attr("class", "lead")
+      .text("Social Networks of Americans")
+      .attr("x", center - 170)
+      .attr("y", title_offset_top)
+    slide_1.append("text")
+      .attr("class", "slideText")
+      .attr("x", center - textWidth / 2)
+      .attr("y", text_offset_top + title_offset_top)
+      .text("Researchers at Stanford University are conducting a study of Americans' social relationships. You will be asked to answer a few questions about your friends and acquaintances.")
+      .call(wrap, textWidth)
+    slide_1.append("text")
+      .attr("class", "slideText")
+      .attr("x", center - textWidth / 2)
+      .attr("y", text_offset_top + title_offset_top + 53)
+      .text("This questionnaire will take you about 10 minutes.")
+      .call(wrap, textWidth)
+    slide_1.append("text")
+      .attr("class", "slideText")
+      .attr("x", center - textWidth / 2)
+      .attr("y", text_offset_top + title_offset_top + 90)
+      .text("We foresee no risk or discomfort associated with this study. There will be no immediate direct benefits to you participating, but we anticipate that results of this work will help us understand how social relationships of Americans look in 2014.")
+      .call(wrap, textWidth)
+    slide_1.append("text")
+      .attr("class", "slideText")
+      .attr("x", center - textWidth / 2)
+      .attr("y", text_offset_top + title_offset_top + 160)
+      .text("If you have questions about your rights as a study participant, or are dissatisfied at any time with any aspect of this study, you may contact - anonymously, if you wish - the Research Compliance Office, Stanford University, Stanford, CA 94305 (or by phone 1-866-680-2906).")
+      .call(wrap, textWidth)
+    slide_1.append("text")
+      .attr("class", "slideText")
+      .attr("x", center - textWidth / 2)
+      .attr("y", text_offset_top + title_offset_top + 230)
+      .text("FOR QUESTIONS ABOUT THE STUDY, CONTACT:")
+      .call(wrap, textWidth)
+    slide_1.append("text")
+      .attr("class", "slideText")
+      .attr("x", center - textWidth / 2)
+      .attr("y", text_offset_top + title_offset_top + 250)
+      .text("Tobias Stark")
+      .call(wrap, textWidth)
+    slide_1.append("text")
+      .attr("class", "slideText")
+      .attr("x", center - textWidth / 2)
+      .attr("y", text_offset_top + title_offset_top + 270)
+      .text("Stanford University, 432 McClatchy Hall, 450 Serra Mall, Stanford, CA, 94305")
+      .call(wrap, textWidth)
+    slide_1.append("text")
+      .attr("class", "slideText")
+      .attr("x", center - textWidth / 2)
+      .attr("y", text_offset_top + title_offset_top + 290)
+      .text("E-mail: TStark@Stanford.edu")
+      .call(wrap, textWidth)
+
+
+    var slide_105 = d3.select("svg").append("g")
+    .attr("id", "slide105")
+    .style("display", "none")
+    slide_105.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_105.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("In the next step, you will be asked information about people outside of your home that you feel closest to. These may be friends, co-workers, neighbors, or relatives. Together, these people make up your social network.") //TODO: make part of text (people-to) bold
+      .call(wrap, textWidth)
+
+	var randomnumber = Math.floor(Math.random() * 11) // TODO: double check that this is really 50/50 chance
+  // var randomnumber = 2;
+    console.log(randomnumber)
+
+    // If random number is even, show additional message about statistics
+    if (randomnumber % 2 == 0) {
+      slide_105.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top + 50)
+        .text("At the end of the questionnaire, you will receive a report that tells you how similar your social network is compared to the average American.")
+      .call(wrap, textWidth)
+    }
+
+
+// Slide 2
+
+  var slide_2 = d3.select("svg").append("g")
+    .attr("id", "slide2")
+    .style("display", "none")
+    slide_2.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_2.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("Who are the people outside of you home that your feel closest to? These may be friends, co-workers, neighbors, relatives, or anyone else who does not live with you. You can enter up to five people.")
+      .call(wrap, textWidth)
+    slide_2.append("text")
+      .attr("class", "slideText")
+      .attr("id", "first_friend_text")
+      .attr("x", center - (textWidth / 2))
+      .attr("y", text_offset_top + 160)
+      .text("Please type the first name of a person you feel closest to. Then click 'Enter.'")
+
+  
+
+   var slide_3 = d3.select("svg").append("g")
+    .attr("id", "slide3")
+    .style("display", "none")
+    slide_3.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_3.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("Who are the people outside of your home that you feel closest to? These may be friends, co-workers, neighbors, relatives, or anyone else who does not live with you. You can enter up to five people.")
+      .call(wrap, textWidth)
+    slide_3.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top + 60)
+        .text("Please type the first name of a person you feel closest to. Then click 'enter.'")
+      .call(wrap, textWidth)
+
+
+    var slide_4 = d3.select("svg").append("g")
+      .attr("id", "slide4")
+      .style("display", "none")
+      slide_4.append("rect") 
+        .style("fill", "white")
+        .attr("class", "slide")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", bodyWidth)
+        .attr("height", bodyHeight)
+    slide_4.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("This is a picture of your social network. We will next ask a couple of questions about the persons in your network.")
+      .call(wrap, textWidth)
+
+
+    var slide_5 = d3.select("svg").append("g")
+      .attr("id", "slide5")
+      .style("display", "none")
+      slide_5.append("rect") 
+        .style("fill", "white")
+        .attr("class", "slide")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", bodyWidth)
+        .attr("height", bodyHeight)
+    slide_5.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("Which of these people are WOMEN? Please click on the names of the WOMEN in your network. Click 'Next' when you are done or if there are no WOMEN among your friends.")
+      .call(wrap, textWidth)
+
+
+    var slide_6 = d3.select("svg").append("g")
+      .attr("id", "slide6")
+      .style("display", "none")
+      slide_6.append("rect") 
+        .style("fill", "white")
+        .attr("class", "slide")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", bodyWidth)
+        .attr("height", bodyHeight)
+      slide_6.append("text")
+          .attr("class", "slideText")
+          .attr("x", center - (textWidth / 2))
+          .attr("y", text_offset_top)
+          .text("We added a color for the men in your network. Please click 'Next' when everything is correct. If you want to change the sex of a person, simply click on the name.") 
+        .call(wrap, textWidth)
+
+
+
+      var slide_7 = d3.select("svg").append("g")
+    .attr("id", "slide7")
+    .style("display", "none")
+    slide_7.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_7.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("Which of these people are WHITE? Please click on the names of the WHITE (Caucasian) people in your social network. Click 'Next' when you are done or if no one is WHITE.")
+      .call(wrap, textWidth)
+
+
+
+      var slide_8 = d3.select("svg").append("g")
+    .attr("id", "slide8")
+    .style("display", "none")
+    slide_8.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_8.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("Which of these people are ASIAN? Please click on the names of the ASIAN people in your social network (including mixed-race Asians). Click 'Next' when you are done or if no one is ASIAN.")
+      .call(wrap, textWidth)
+
+
+  var slide_9 = d3.select("svg").append("g")
+    .attr("id", "slide9")
+    .style("display", "none")
+    slide_9.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_9.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("Which of these people are BLACK? Please click on the names of the BLACK people in your social network (including mixed-race Blacks). Click 'Next' when you are done or if no one is BLACK.")
+      .call(wrap, textWidth)
+
+
+
+    var slide_10 = d3.select("svg").append("g")
+    .attr("id", "slide10")
+    .style("display", "none")
+    slide_10.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_10.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("Which of these people are HISPANIC? Please click on the names of the HISPANIC people in your social network (including mixed-race Hispanics). Click 'Next' when you are done or if no one is HISPANIC.")
+      .call(wrap, textWidth)
+
+
+    var slide_11 = d3.select("svg").append("g")
+    .attr("id", "slide11")
+    .style("display", "none")
+    slide_11.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_11.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("Which of these people are 'OTHER' race? Please click on the names of the people of OTHER races in your social network. Click 'Next' when you are done or if no one is of OTHER races.")
+      .call(wrap, textWidth)  
+
+
+    var slide_12 = d3.select("svg").append("g")
+    .attr("id", "slide12")
+    .style("display", "none")
+    slide_12.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_12.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("How often do you talk to each person in your network? Drag the circles with the names of each person into the box below that indicates how often you talk to each other.")
+      .call(wrap, textWidth) 
+
+    var slide_1200 = d3.select("svg").append("g")
+      .attr("id", "slide1200")
+      .style("display", "none")
+    slide_1200.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_1200.append("text")
+      .attr("class", "slideText")
+      .attr("x", center - (textWidth / 2))
+      .attr("y", text_offset_top)
+      .text("As far as you know, what is the highest level of education of each person? Please offer your best guess if you are not certain.")
+    .call(wrap, textWidth) 
+
+
+    var slide_13 = d3.select("svg").append("g")
+      .attr("id", "slide13")
+      .style("display", "none")
+    slide_13.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_13.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("Who knows whom? Which of these people know each other? To indicate that two persons know each other, click on the name of the first person and then on the name of the second person. This will create a line between the two") //TODO: add example
+      .call(wrap, textWidth)
+
+
+
+var slide_14 = d3.select("svg").append("g")
+    .attr("id", "slide14")
+    .style("display", "none")
+    slide_14.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_14.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("Now we would like to learn more about the friends of the people in your network")
+      .call(wrap, textWidth)
+
+
+
+var slide_15 = d3.select("svg").append("g")
+    .attr("id", "slide15")
+    .style("display", "none")
+    slide_15.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_15.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+      .call(wrap, textWidth)
+
+
+var slide_16 = d3.select("svg").append("g")
+    .attr("id", "slide16")
+    .style("display", "none")
+    slide_16.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_16.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+      .call(wrap, textWidth)
+
+var slide_17 = d3.select("svg").append("g")
+    .attr("id", "slide17")
+    .style("display", "none")
+    slide_17.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_17.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+      .call(wrap, textWidth)
+
+  var slide_18 = d3.select("svg").append("g")
+    .attr("id", "slide18")
+    .style("display", "none")
+    slide_18.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_18.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+      .call(wrap, textWidth)
+
+  var slide_19 = d3.select("svg").append("g")
+    .attr("id", "slide19")
+    .style("display", "none")
+    slide_19.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_19.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+      .call(wrap, textWidth)
+
+  var slide_20 = d3.select("svg").append("g")
+    .attr("id", "slide20")
+    .style("display", "none")
+    slide_20.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_20.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("Here is a comparison of your social network with the average American social network, just as promised at the beginning of the survey.")
+      .call(wrap, textWidth)
+
+    var slide_21 = d3.select("svg").append("g")
+    .attr("id", "slide21")
+    .style("display", "none")
+    slide_21.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_21.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("Beep bop boop!")
+      .call(wrap, textWidth)
+
+  var slide_24 = d3.select("svg").append("g")
+    .attr("id", "slide24")
+    .style("display", "none")
+    slide_24.append("rect") 
+      .style("fill", "white")
+      .attr("class", "slide")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", bodyWidth)
+      .attr("height", bodyHeight)
+    slide_24.append("text")
+        .attr("class", "slideText")
+        .attr("x", center - (textWidth / 2))
+        .attr("y", text_offset_top)
+        .text("Thank you very much for taking part in this research study.")
+      .call(wrap, textWidth)
+
+
+    var graph = d3.select("svg").append("g")
+      .attr("id", "graph")
+      .style("display", "none")
+
+
+
+
+    restart();
+    d3.selectAll(".node").attr("display", "none");
+
+
+    // Boxes indicating frequency into which nodes are dragged
+    var timeBar = d3.select("svg").append("g")
+      .attr("id", "timeBar")
+      .style("display", "none")
+
+      timeBar.append("rect")
+        .attr("class", "bar_target")
+        .attr("id", "several")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x)
+        .attr("y", timebar_offset_y)
+        .attr("width", bar_target_width)
+        .attr("height", bar_target_height);
+
+      timeBar.append("rect")
+        .attr("class", "bar_label")
+        .attr("id", "several_lab")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x)
+        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+        .attr("width", bar_target_width)
+        .attr("height", bar_label_height);
+
+      timeBar.append("text")
+        .attr("class", "bar_text")
+        .text("Several times a day")
+        .attr("x", timebar_offset_x + (bar_target_width / 2) - 63)
+        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+
+
+      timeBar.append("rect")
+        .attr("class", "bar_target")
+        .attr("id", "daily")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + bar_target_width + timebar_margin)
+        .attr("y", timebar_offset_y)
+        .attr("width", bar_target_width)
+        .attr("height", bar_target_height);
+
+       timeBar.append("rect")
+        .attr("class", "bar_label")
+        .attr("id", "daily_lab")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + bar_target_width + timebar_margin)
+        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+        .attr("width", bar_target_width)
+        .attr("height", bar_label_height); 
+
+      timeBar.append("text")
+        .attr("class", "bar_text")
+        .text("Almost every day")
+        .attr("x", timebar_offset_x + bar_target_width + timebar_margin + (bar_target_width / 2) - 50)
+        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+
+
+      timeBar.append("rect")
+        .attr("class", "bar_target")
+        .attr("id", "multiple")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + (bar_target_width + timebar_margin) * 2)
+        .attr("y", timebar_offset_y)
+        .attr("width", bar_target_width)
+        .attr("height", bar_target_height);
+
+      timeBar.append("rect")
+        .attr("class", "bar_label")
+        .attr("id", "multiple_lab")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + (bar_target_width + timebar_margin) * 2)
+        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+        .attr("width", bar_target_width)
+        .attr("height", bar_label_height);
+
+
+      timeBar.append("text")
+        .attr("class", "bar_text")
+        .text("At least once a week")
+        .attr("x", timebar_offset_x + (bar_target_width + timebar_margin) * 2 + (bar_target_width / 2) - 70)
+        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+          
+
+      timeBar.append("rect")
+        .attr("class", "bar_target")
+        .attr("id", "weekly")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + (bar_target_width + timebar_margin) * 3)
+        .attr("y", timebar_offset_y)
+        .attr("width", bar_target_width)
+        .attr("height", bar_target_height);
+
+      timeBar.append("rect")
+        .attr("class", "bar_label")
+        .attr("id", "weekly_lab")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + (bar_target_width + timebar_margin) * 3)
+        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+        .attr("width", bar_target_width)
+        .attr("height", bar_label_height);
+
+      timeBar.append("text")
+        .attr("class", "bar_text")
+        .text("At least once a month")
+        .attr("x", timebar_offset_x + (bar_target_width + timebar_margin) * 3 + (bar_target_width / 2) - 70)
+        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+
+
+      timeBar.append("rect")
+        .attr("class", "bar_target")
+        .attr("id", "monthly")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + (bar_target_width + timebar_margin) * 4)
+        .attr("y", timebar_offset_y)
+        .attr("width", bar_target_width)
+        .attr("height", bar_target_height);
+
+      timeBar.append("rect")
+        .attr("class", "bar_label")
+        .attr("id", "monthly_lab")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + (bar_target_width + timebar_margin) * 4)
+        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+        .attr("width", bar_target_width)
+        .attr("height", bar_label_height);
+
+      timeBar.append("text")
+        .attr("class", "bar_text")
+        .text("Less than once a month") 
+        .attr("x", timebar_offset_x + (bar_target_width + timebar_margin) * 4 + (bar_target_width / 2) - 70)
+        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+
+
+
+    // Boxes indicating frequency into which nodes are dragged
+    var fourBar = d3.select("svg").append("g")
+      .attr("id", "fourBar")
+      .style("display", "none")
+
+      fourBar.append("rect")
+        .attr("class", "bar_target")
+        .attr("id", "several")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x)
+        .attr("y", timebar_offset_y)
+        .attr("width", bar4_target_width)
+        .attr("height", bar_target_height);
+
+     
+
+
+      fourBar.append("rect")
+        .attr("class", "bar_target")
+        .attr("id", "daily")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + bar4_target_width + timebar_margin)
+        .attr("y", timebar_offset_y)
+        .attr("width", bar4_target_width)
+        .attr("height", bar_target_height);
+
+
+      fourBar.append("rect")
+        .attr("class", "bar_target")
+        .attr("id", "multiple")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 2)
+        .attr("y", timebar_offset_y)
+        .attr("width", bar4_target_width)
+        .attr("height", bar_target_height);
+
+      
+          
+
+      fourBar.append("rect")
+        .attr("class", "bar_target")
+        .attr("id", "weekly")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 3)
+        .attr("y", timebar_offset_y)
+        .attr("width", bar4_target_width)
+        .attr("height", bar_target_height);
+
+     
+
+ 
+
+  function tick() {
+  link.attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+
+  node.attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; })
+      .attr("name", function(d) { return d.name; })
+      .attr("id", function(d) { return d.id; })
+      .attr("race", function(d) { return d.race; })
+      .attr("edu", function(d) { return d.edu; })
+      .attr("freq", function(d) { return d.freq; })
+      .attr("gender", function(d) { return d.gender; })
+      .attr("transform", function(d){return "translate("+d.x+","+d.y+")"});
+  }
+
+
+
+
+
+  function addFriend() {
+  	
+
+    if (numFriends == 0) {
+      //var txt = document.getElementById("first_friend_text")
+      //txt.style.display = "none";
+      //txt.text = "Is there another person to whom you feel close? Please enter their first name."
+      //txt.style.display = "block";
+      //document.getElementById("slide2").append(txt)
+
+      d3.selectAll("slide_2").select("first_friend_text").text = "Is there another person to whom you feel close? Please enter their first name."
+      d3.select("slide_2").append("first_friend_text");
+    }
+
+    numFriends++;
+
+    var friendName = document.getElementById("friendNameID");
+
+    if (numFriends <= 5) {
+      var node = {name: friendName.value, id: numFriends, gender:"", race:"", edu:null, freq:null},
+          n = nodes.push(node);
+      
+      links.push({source: node, target: 0});
+
+
+
+      restart();
+    }
+
+    document.getElementById("friendNameID").value = '' //TODO: this does noytyyyyytttt work
+  }
+
+
+
+  function restart() {
+
+
+
+    force.start();
+
+    link = link.data(links);
+
+    link.enter().insert("line", ".node")
+        .attr("class", "link");
+
+    node = node.data(nodes);
+
+  //  var label = node.enter().append("g")
+
+
+    var n = node.enter().append("svg:g")
+        .attr("class", "node")
+        .call(force.drag);
+      n.append("svg:circle")
+          .attr("class", "node")
+          .attr("r", 25)
+          .on("click", nodeSelect)
+          .call(force.drag);
+
+      n.append("svg:text")
+          .attr("class", "node_text")
+          .attr("text-anchor", "middle")  
+          .attr("dy", ".3em")
+          .attr("pointer-events", "none")
+          .text(function(d) { return d.name });
+
+      n.attr("transform", function(d){return "translate("+d.x+","+d.y+")"});
+
+
+  }
+
+
+
+
+  // Wraps text to fit in a span of width 'width'
+  function wrap(text, width) {
+    text.each(function() {
+      var text = d3.select(this),
+          words = text.text().split(/\s+/).reverse(),
+          word,
+          line = [],
+          lineNumber = 0,
+          lineHeight = 1.1, // ems
+          y = text.attr("y"),
+          x = text.attr("x")
+         // dy = parseFloat(text.attr("dy")),
+          tspan = text.text(null).append("tspan").attr("x", x).attr("y", y);
+      while (word = words.pop()) {
+        line.push(word);
+        tspan.text(line.join(" "));
+        if (tspan.node().getComputedTextLength() > width) {
+          line.pop();
+          tspan.text(line.join(" "));
+          line = [word];
+          tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + "em").text(word);         
+        }
+      }
+    });
+  } 
+
+
+
+  // Shows part two of question when individual friend answers 'yes'
+  function yesBlackFriends() {
+
+   /* var knowFriends = document.getElementById("knowBlackFriends");
+    knowFriends.style.display = "block";*/
+  }
+
+
+
+  function noBlackFriends() {
+   // document.getElementById("knowBlackFriends").style.display = "none";
+  }
+
+
+
+  //TODO: use to gather data from previous friend, if possible
+  function refreshRadio() {
+
+      var text1 = "question" + askedAbout + "_text1";
+      var text2 = "question" + askedAbout + "_text2";
+      var text3 = "question" + askedAbout + "_text3";
+      var win = "question" + askedAbout + "_window";
+
+
+      var have = document.getElementById("haveBlackFriends")
+      var know = document.getElementById("knowBlackFriends");
+      var friends = document.getElementById("friendsBlackFriends");
+
+      document.getElementById(text1).style.display = "none"; //TODO: fix error of when there are 0 friends entered
+      document.getElementById(text2).style.display = "none";
+      document.getElementById(text3).style.display = "none";
+      document.getElementById(win).style.display = "none";
+
+      for(var i=0;i<have.length;i++) {
+        have[i].checked = false;
+      }
+      for(var i=0;i<know.length;i++) {
+        know[i].checked = false;
+      }
+      for (var i = 0; i < friends.length; i++) {
+        friends[i].checked = false;
+      }
+      have.style.display = "none";
+      know.style.display = "none";
+      friends.style.display = "none";
+  }
+
+
+
+  var selected = false;
+  var targetId;
+  var sourceId;
+
+
+
+
+
+
+  // Handles node selections depending on the current slide
+  function nodeSelect(d) {
+
+    // Slide 5: select female friends
+    if (currSlide == 5) {
+      if (d.name != "You") {
+
+        if (d.gender == "female") {
+          d3.select(this).style("fill", nodeColor)
+          d.gender = "";
+        } else {
+          d3.select(this).style("fill", femaleColor)
+          d.gender = "female";
+        }
+      }
+    }
+
+    // allow user to switch between male and female
+    if (currSlide == 6) {
+      if (d.name != "You") {
+
+        if (d.gender == "female") {
+          d3.select(this).style("fill", maleColor)
+          d.gender = "male";
+        } else {
+          d3.select(this).style("fill", femaleColor)
+          d.gender = "female";
+        }
+      }
+    }
+
+
+
+    // Slide 7: select white friends
+    else if (currSlide == 7) {
+      if (d.name != "You") {
+         if (d.race.indexOf("white") !== -1) {       
+          d3.select(this).style("fill", nodeColor)
+          d.race = ""; 
+        } else {
+          d3.select(this).style("fill", asianColor) // All selected nodes set to asian color (red)
+          d.race = "white";
+        }
+      }
+    }
+
+
+    // Make the race bold 
+
+    // Slide 8: select asian friends
+    else if (currSlide == 8) {
+      if (d.name != "You") {
+        if (d.race.indexOf("asian") !== -1) {       
+          d3.select(this).style("fill", nodeColor)
+          var str = d.race;
+          d.race = str.replace("asian","");
+        } else {
+          d3.select(this).style("fill", asianColor)
+          d.race += "asian";
+        }
+
+      }
+    }
+
+
+
+    // Slide 9: select black friends
+    else if (currSlide == 9) {
+      if (d.name != "You") {
+        if (d.race.indexOf("black") !== -1) {       
+          d3.select(this).style("fill", nodeColor)
+          var str = d.race;
+          d.race = str.replace("black","");
+        } else {
+          d3.select(this).style("fill", asianColor)
+          d.race += "black";
+        }
+      }
+    }
+
+
+
+    // Slide 10: select hispanic friends
+    else if (currSlide == 10) {
+      if (d.name != "You") {
+        if (d.race.indexOf("hispanic") !== -1) {       
+          d3.select(this).style("fill", nodeColor)
+          var str = d.race;
+          d.race = str.replace("hispanic","");
+        } else {
+          d3.select(this).style("fill", asianColor)
+          d.race += "hispanic";
+        }
+      }
+    }
+
+
+
+    // Slide 11: select for 'other' race friends
+    else if (currSlide == 11) {
+      if (d.name != "You") {
+        if (d.race.indexOf("other") !== -1) {       
+          d3.select(this).style("fill", nodeColor)
+          var str = d.race;
+          d.race = str.replace("other","");
+        } else {
+          d3.select(this).style("fill", asianColor)
+          d.race += "other";
+        }
+      }
+    }
+
+
+
+    // Slide 12: drag nodes into boxes
+    else if (currSlide == 12) {
+
+
+    }
+
+
+
+    // Slide 13: draw links between friends that know each other 
+    else if (currSlide == 13) {
+    
+      var targetIndex;
+      var sourceIndex;
+
+      if (selected == false) {
+        targetId = d.id;
+        console.log("targetId: " + targetId);
+        selected = true;
+      } else {
+        sourceId = d.id;
+        console.log("sourceid: " + sourceId);
+        if (targetId != sourceId) {
+          nodes.forEach(function(n) {
+            if (n.id == targetId) {
+              targetIndex = n.index;
+              console.log("target: " + targetIndex);
+            } else if (n.id == sourceId) {
+              sourceIndex = n.index;
+              console.log("source: " + sourceIndex);
+            } 
+          })
+          links.push({source: sourceIndex, target: targetIndex});
+        }
+        selected = false;
+      }
+
+      restart();
+
+    }
+
+
+  }
+
+
+
+
+
+
+  // Makes all nodes default color
+  function clearColors() {
+    d3.selectAll(".node").style("fill", nodeColor)
+  }
+
+
+
+
+
+  // If respondent has not filled in an answer, reminds them
+  function promptNonresponse() {
+      
+    document.getElementById("nonresponse_box").style.display = "block";
+    document.getElementById("popup").style.display = "block";
+
+  }
+
+
+
+
+
+  function closePopup() {
+
+    document.getElementById("nonresponse_box").style.display = "none";
+    document.getElementById("popup").style.display = "none";
+  }
+
+
+
+
+
+  function drawBox(node) {
+
+
+        var q_x = node.x - 100;
+        var x = q_x.toString();
+
+        var q_y = node.y - 130;
+        var y = q_y.toString();
+
+
+        haveFriends = document.getElementById("haveBlackFriends");
+        friendsFriends = document.getElementById("friendsBlackFriends");
+        knowFriends = document.getElementById("knowBlackFriends");
+
+        haveFriends.style.left = x + "px";
+        haveFriends.style.top = y + "px";
+        haveFriends.style.display = "block";
+
+        friendsFriends.style.top = y + "px";
+        friendsFriends.style.left = x + "px";
+
+        knowFriends.style.top = y + "px";
+        knowFriends.style.left = x + "px"
+
+        currSlide += .5;
+
+
+  }
+
+
+
+
+  
+
+
+
+
+  // ---------------------------------------------------------------------------------------
+  // showNext(): Prepares for next slide in survey. Hides previous slide and shows currSlide,
+  // performing whatever operations needed for preparing slide.
+  // A bit like the main() function
+  // ---------------------------------------------------------------------------------------
+
+
+  function showNext() {
+
+
+
+    if (currSlide == 1) {
+      var d = new Date();
+      startTime = d.getTime();
+     
+      document.getElementById("Next").style.position="absolute";
+      document.getElementById("slide1").style.display = "none";
+     // document.getElementById("slide2").style.display = "block";
+     // document.getElementById("name_input").style.display = "block"
+
+
+
+     // Ask about respondent's gender
+
+     var gend = document.getElementById("userGender");
+     gend.style.left = string_l + "px";
+     gend.style.top = string_t;
+     gend.style.display = "block";
+
+    currSlide += 100;
+
+
+
+
+    } else if (currSlide == 101) {
+
+
+      // If user has not selected an option, alert with popup
+      if ($('input[name=userGender]:checked').length == 0 && checked == false) {
+
+        promptNonresponse();
+        checked = true;
+
+
+
+      } else {
+    
+
+
+        var gend = document.getElementById("userGender")
+
+
+        // Collect information about respondent's gender 
+        if (gend[0].checked == true) {
+          nodes[0].gender = "male";
+        } else if (gend[1].checked == true) {
+          nodes[0].gender = "female";
+        }
+
+
+
+
+        // Ask about respondent's age
+       gend.style.display = "none";
+        var age = document.getElementById("age");
+        age.style.left = string_l + "px";
+        age.style.top = string_t;
+        age.style.display = "block";
+
+        //TODO: check for a number between 18 and 99
+        //TODO: collect this data upon 'Next' click
+             
+        currSlide += 1;
+        checked = false;    
+      }
+
+
+
+
+
+    } else if (currSlide == 102) {
+
+      //TODO: check that age has been entered, and that it is within a certain range
+      // If user has not selected an option, alert with popup
+     // if ($('input[name=age]:checked').length == 0 && checked == false) {
+
+   //     promptNonresponse();
+    //    checked = true;
+
+     // } else {
+
+
+
+
+        // Ask about respondent's education
+
+        document.getElementById("age").style.display = "none";
+        var ed = document.getElementById("userEd");
+        ed.style.left = string_l + "px";
+        ed.style.top = string_t;
+        ed.style.display = "block";
+
+        currSlide += 1;
+        checked = false;
+    //  }
+
+
+
+
+
+    } else if (currSlide == 103) { 
+
+
+
+      // If user has not selected an option, alert with popup
+      if ($('input[name=uEdu]:checked').length == 0 && !checked) {
+
+        promptNonresponse();
+        checked = true;
+
+      } else {
+
+
+
+
+        // Collect information about respondent's education
+
+        var edu = document.getElementById("userEdu")
+
+        if (edu[0].checked) {
+          nodes[0].edu = "less_highschool";
+        } else if (edu[1].checked) {
+          nodes[0].edu = "highschool";
+        } else if (edu[2].checked) {
+          nodes[0].edu = "some_college";
+        } else if (edu[3].checked) {
+          nodes[0].edu = "college_plus";
+        }
+
+
+
+
+        // Ask whether respondent is hispanic
+        document.getElementById("userEd").style.display = "none";
+        var hisp = document.getElementById("areHispanic");
+        hisp.style.left = string_l + "px";
+        hisp.style.top = string_t;
+        hisp.style.display = "block";
+
+        currSlide++;
+        checked = false;
+      }
+
+
+
+
+
+    } else if (currSlide == 104) {
+
+
+
+      // If user has not selected an option, alert with popup
+      if ($('input[name=areHispanic]:checked').length == 0 && !checked) {
+
+        promptNonresponse();
+        checked = true;
+
+
+
+
+      } else {
+
+
+
+        var hisp = document.getElementById("areHispanic")
+        if (hisp[0].checked) {
+          nodes[0].race = "hispanic";
+          // skip question 5
+          document.getElementById("slide105").style.display = "block";
+          document.getElementById("userRace").style.display = "none";
+          document.getElementById("areHispanic").style.display = "none";
+
+          currSlide += 2;
+
+
+        } else {
+
+
+          // ask question 5
+           document.getElementById("areHispanic").style.display = "none";
+          var race = document.getElementById("userRace");
+          race.style.left = string_l + "px";
+          race.style.top = string_t;
+          race.style.display = "block";
+          currSlide++;
+        }
+        checked = false;
+      }
+
+
+
+
+
+    } else if (currSlide == 105) {
+
+
+
+      // If user has not selected an option, alert with popup
+      if ($('input[name=uRace]:checked').length == 0 && checked == false) {
+
+        promptNonresponse();
+        checked = true;
+
+
+
+      } else {
+
+        // Collect information about respondent's race
+        var race = document.getElementById("userRace");
+        if (race[0].checked) {
+          nodes[0].race += "white"
+        }
+        if (race[1].checked) {
+          nodes[0].race += "black";
+        }
+        if (race[2].checked) {
+          nodes[0].race += "native";
+        }
+        if (race[3].checked) {
+          nodes[0].race += "asian";
+        }
+        if (race[4].checked) {
+          nodes[0].race += "other";
+        }
+
+
+        document.getElementById("areHispanic").style.display = "none";
+        document.getElementById("slide105").style.display = "block";
+        document.getElementById("userRace").style.display = "none";
+        document.getElementById("example_net").style.display = "block";
+       // var top = center - 180;
+       // pic.style.top = top.toString();
+       // pic.style.display = "block";
+        currSlide++;
+        checked = false;
+      }
+
+
+       
+
+
+
+    } else if (currSlide == 106) {
+
+      // TODO: check with respondent if fewer than 5 friends have been added
+
+
+
+      document.getElementById("slide105").style.display = "none";
+      document.getElementById("areHispanic").style.display = "none";
+      document.getElementById("userRace").style.display = "none";     
+      d3.selectAll(".node").attr("display", "block");
+      document.getElementById("slide2").style.display = "none";
+      document.getElementById("slide3").style.display = "block";
+      document.getElementById("name_input").style.display = "block";
+      document.getElementById("example_net").style.display = "none";
+      currSlide = 3;
+
+
+
+
+    } else if (currSlide == 3) {
+
+      document.getElementById("slide3").style.display = "none";
+      document.getElementById("slide4").style.display = "block";
+      document.getElementById("name_input").style.display = "none";
+      currSlide++;
+
+
+
+
+    } else if (currSlide == 4) {
+
+      // Set to tag female friends
+
+      // TODO: fix this
+      d3.selectAll("circle.nodes").transition().duration(400).style("fill", function(d) { return i = 0 ? "#AAA" : "9CD4D4" });
+
+      document.getElementById("slide4").style.display = "none";
+      document.getElementById("slide5").style.display = "block";
+      currSlide++;
+
+
+
+
+    } else if (currSlide == 5) {
+
+      // Tag male friends
+      d3.selectAll(".node").style("fill", function(d) {
+        if (d.name != "You") {
+          if (d.gender != "female") {
+            d.gender = "male";
+            return maleColor;
+          } else {
+            return femaleColor;
+          }
+        }
+       });
+
+      document.getElementById("slide5").style.display = "none";
+      document.getElementById("slide6").style.display = "block";
+      currSlide++;
+
+
+
+
+    } else if (currSlide == 6) {
+
+      clearColors();
+
+      // TODO: add legend making clear that selected nodes (red) are tagged as that race
+
+      // Tag white friends
+
+      document.getElementById("slide6").style.display = "none";
+      document.getElementById("slide7").style.display = "block";
+      currSlide++;
+
+
+
+
+    } else if (currSlide == 7) {
+
+      clearColors();
+
+      // Tag Asian friends
+
+      document.getElementById("slide7").style.display = "none";
+      document.getElementById("slide8").style.display = "block";
+      currSlide++;
+
+
+
+
+    } else if (currSlide == 8) {
+
+      clearColors();
+
+      // Tag black friends
+
+      document.getElementById("slide8").style.display = "none";
+      document.getElementById("slide9").style.display = "block";
+      currSlide++;
+
+
+
+
+    } else if (currSlide == 9) {
+
+      clearColors();
+
+      // Tag hispanic friends
+      document.getElementById("slide9").style.display = "none";
+      document.getElementById("slide10").style.display = "block";
+      currSlide++;
+
+
+
+
+    } else if (currSlide == 10) {    
+
+      clearColors();
+
+      //Tag other friends
+      document.getElementById("slide10").style.display = "none";
+      document.getElementById("slide11").style.display = "block";
+      currSlide++;
+
+
+
+
+    } else if (currSlide == 11) {
+
+      // Prepare nodes for dragging into boxes
+      clearColors();
+
+      var labelBar = d3.select("svg").append("g")
+        .style("display", "block")
+        .attr("id", "labelBar1");
+
+       labelBar.append("rect")
+        .attr("class", "bar_label")
+        .attr("id", "several_lab")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x)
+        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+        .attr("width", bar4_target_width)
+        .attr("height", bar_label_height);
+
+      labelBar.append("text")
+        .attr("class", "bar_text")
+        .text("Almost every day")
+        .attr("x", timebar_offset_x + (bar4_target_width / 2) - 60)
+        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+
+       labelBar.append("rect")
+        .attr("class", "bar_label")
+        .attr("id", "daily_lab")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + bar4_target_width + timebar_margin)
+        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+        .attr("width", bar4_target_width)
+        .attr("height", bar_label_height); 
+
+      labelBar.append("text")
+        .attr("class", "bar_text")
+        .text("At least once a week")
+        .attr("x", timebar_offset_x + bar4_target_width + timebar_margin + (bar4_target_width / 2) - 70)
+        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+
+    labelBar.append("rect")
+        .attr("class", "bar_label")
+        .attr("id", "multiple_lab")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 2)
+        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+        .attr("width", bar4_target_width)
+        .attr("height", bar_label_height);
+
+
+      labelBar.append("text")
+        .attr("class", "bar_text")
+        .text("At least once a month")
+        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 2 + (bar4_target_width / 2) - 70)
+        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+      labelBar.append("rect")
+        .attr("class", "bar_label")
+        .attr("id", "weekly_lab")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 3)
+        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+        .attr("width", bar4_target_width)
+        .attr("height", bar_label_height);
+
+      labelBar.append("text")
+        .attr("class", "bar_text")
+        .text("Less than once a month")
+        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 3 + (bar4_target_width / 2) - 80)
+        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+
+      d3.selectAll(".node").classed("fixed", function(d) { d.fixed = true});
+      d3.selectAll(".node").attr("opacity", function(d) { if (d.index == 0) { return .4}});
+      d3.selectAll(".link").attr("display", "none");
+     //document.getElementById("timeBar").style.display = "block"
+      document.getElementById("fourBar").style.display = "block";
+
+      document.getElementById("slide11").style.display = "none";
+      document.getElementById("slide12").style.display = "block";
+      currSlide++;
+
+
+
+
+    } else if (currSlide == 12) {
+
+      /* For gathering data from 5 boxes
+
+      nodes.forEach(function(n) {
+        if (n.index > 0) {
+          if (n.x < timebar_offset_x + bar_target_width) {
+            n.freq = "several_day";
+            console.log("several: " + n.name);
+          } else if (n.x < timebar_offset_x + bar_target_width * 2 + timebar_margin) {
+            n.freq = "daily";
+            console.log("daily: " + n.name);
+          } else if (n.x < timebar_offset_x + (bar_target_width + timebar_margin) * 2 + bar_target_width) {
+           n.freq = "mult_week";
+            console.log("multiple: " + n.name);
+          } else if (n.x < timebar_offset_x + (bar_target_width + timebar_margin) * 3 + bar_target_width) {
+            n.freq = "weekly"
+            console.log("weekly: " + n.name);
+          } else {
+           n.freq = "monthly";
+            console.log("monthly: " + n.name);
+          }
+        }
+      });*/
+
+//TODO: add 'error' message if a node is not within the bounds of the label
+//TODO: check link fade out before link creation
+//TODO: add box to individual friend questions
+      nodes.forEach(function(n) { 
+        if (n.index > 0) {
+          if (n.x < timebar_offset_x + bar4_target_width && n.y > timebar_offset_y) {
+            n.freq = "daily";
+            console.log("daily: " + n.name );
+          } else if (n.x < timebar_offset_x + bar4_target_width * 2 + timebar_margin && n.y > timebar_offset_y) {
+            n.freq = "weekly";
+            console.log("weekly: " + n.name);
+          } else if (n.x < timebar_offset_x + (bar4_target_width + timebar_margin) * 2 + bar4_target_width && n.y > timebar_offset_y) {
+           n.freq = "monthly";
+            console.log("montly: " + n.name);
+          } else if (n.y > timebar_offset_y) {
+            n.freq = "less_monthly"
+            console.log("less_monthly: " + n.name);
+          }
+        }
+      }); 
+      
+
+      d3.selectAll(".node").classed("fixed", function(d) { 
+        if (d.index > 0 ) {
+          d.fixed = false
+        }
+      });
+
+      restart();
+
+
+      d3.selectAll(".link").attr("display", "block");     
+      d3.selectAll(".node").attr("opacity", function(d) { if (d.index == 0) { return 1}});
+
+      setTimeout(function() {
+        d3.selectAll(".node").classed("fixed", function(d) { d.fixed = true});
+        d3.selectAll(".link").attr("display", "none");  
+        d3.selectAll(".node").attr("opacity", function(d) { return d.index == 0 ? .4 : 1 });
+      },1500);
+
+      
+      document.getElementById("labelBar1").style.display = "none";
+      document.getElementById("timeBar").style.display = "none";
+      document.getElementById("slide12").style.display = "none";
+      document.getElementById("fourBar").style.display = "block";
+      document.getElementById("slide1200").style.display = "block";
+    var labelBar = d3.select("svg").append("g")
+        .style("display", "block")
+        .attr("id", "labelBar2");
+
+       labelBar.append("rect")
+        .attr("class", "bar_label")
+        .attr("id", "several_lab")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x)
+        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+        .attr("width", bar4_target_width)
+        .attr("height", bar_label_height);
+
+      labelBar.append("text")
+        .attr("class", "bar_text")
+        .text("Less than high school")
+        .attr("x", timebar_offset_x + (bar4_target_width / 2) - 70)
+        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+
+       labelBar.append("rect")
+        .attr("class", "bar_label")
+        .attr("id", "daily_lab")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + bar4_target_width + timebar_margin)
+        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+        .attr("width", bar4_target_width)
+        .attr("height", bar_label_height); 
+
+      labelBar.append("text")
+        .attr("class", "bar_text")
+        .text("High school")
+        .attr("x", timebar_offset_x + bar4_target_width + timebar_margin + (bar4_target_width / 2) - 50)
+        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+
+    labelBar.append("rect")
+        .attr("class", "bar_label")
+        .attr("id", "multiple_lab")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 2)
+        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+        .attr("width", bar4_target_width)
+        .attr("height", bar_label_height);
+
+
+      labelBar.append("text")
+        .attr("class", "bar_text")
+        .text("Some college")
+        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 2 + (bar4_target_width / 2) - 55)
+        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+      labelBar.append("rect")
+        .attr("class", "bar_label")
+        .attr("id", "weekly_lab")     
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 3)
+        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+        .attr("width", bar4_target_width)
+        .attr("height", bar_label_height);
+
+      labelBar.append("text")
+        .attr("class", "bar_text")
+        .text("Bachelors degree or higher")
+        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 3 + (bar4_target_width / 2) - 85)
+        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+
+
+      currSlide = 1200;
+
+
+    } else if (currSlide == 1200) {
+
+      // Data collection
+
+      nodes.forEach(function(n) {
+        if (n.index > 0) { 
+          if (n.x < timebar_offset_x + bar4_target_width && n.y > timebar_offset_y) {
+            n.edu = "less_highschool";
+            console.log("daily: " + n.name);
+          } else if (n.x < timebar_offset_x + bar4_target_width * 2 + timebar_margin && n.y > timebar_offset_y) {
+            n.edu = "highschool";
+            console.log("weekly: " + n.name);
+          } else if (n.x < timebar_offset_x + (bar4_target_width + timebar_margin) * 2 + bar4_target_width && n.y > timebar_offset_y) {
+           n.edu = "some_college";
+            console.log("montly: " + n.name);
+          } else if (n.y > timebar_offset_y) {
+            n.edu = "college_plus"
+            console.log("less_monthly: " + n.name);
+          }
+        }
+      }); 
+      
+
+      document.getElementById("slide13").style.display = "block";
+      document.getElementById("fourBar").style.display = "none";
+      document.getElementById("slide1200").style.display = "none";
+      document.getElementById("labelBar2").style.display = "none";
+    
+
+
+      d3.selectAll(".node").classed("fixed", function(d) { 
+        if (d.index > 0 ) {
+          d.fixed = false
+        }
+      });
+
+      restart();
+
+
+     // d3.selectAll(".link").attr("display", "block");     
+     // d3.selectAll(".node").attr("opacity", function(d) { if (d.index == 0) { return 1}});
+      
+
+      setTimeout(function() {
+        d3.selectAll(".node").classed("fixed", function(d) { d.fixed = true});  
+
+      },1000);
+
+
+      currSlide = 13;
+
+    } else if (currSlide == 13) {
+
+      document.getElementById("slide13").style.display = "none";
+      document.getElementById("slide14").style.display = "block";
+
+      currSlide++;
+
+
+
+
+
+    } else if (currSlide == 14) {
+
+      document.getElementById("slide14").style.display = "none";
+
+        // Fix nodes and hide links in preparation for individual questions
+        d3.selectAll(".node").classed("fixed", function(d) { d.fixed = true});
+        d3.selectAll(".link").attr("display", "none");  
+
+      // Checks to see if there are no friends to ask about or if the respondent is black, in which case skips individual
+      // friend questions.
+      if (askedAbout == numFriends || nodes[0].race.indexOf("black") !== -1) {
+
+
+        d3.selectAll(".node").attr("opacity", 1);
+        d3.selectAll(".link").attr("display", "block");
+        d3.selectAll(".node").style("display", "none");
+        d3.selectAll(".link").style("display", "none");
+        d3.selectAll(".node").classed("fixed", function(d) {  
+          if (d.index > 0 ) {
+            d.fixed = false
+          }
+        });
+        restart();
+
+        // If no friends left, skip to slide 20
+        //document.getElementById("slide20").style.display = "block";
+        currSlide += 5;
+        skipped = true;
+        showNext();
+
+      } else {
+
+        
+
+        askedAbout++;
+
+        // Ask questions about friend 1
+           
+        d3.selectAll(".node").attr("opacity", function(d) { return d.index == askedAbout ? 1 : .4 });
+
+        currNode = nodes[askedAbout];
+
+
+        document.getElementById("slide15").style.display = "block";
+
+
+        d3.select("svg").append("rect")
+            .attr("class", "q_window")
+            .attr("id", "question1_window")
+            .attr("rx", 2)
+            .attr("ry", 2)
+            .attr("width", q_window_width)
+            .attr("height", q_window_height)
+            .attr("x", currNode.x - q_window_width / 2)
+            .attr("y", currNode.y - q_window_height / 2)
+
+        d3.select("svg").append("rect")
+            .attr("class", "backdrop")
+            .attr("id", "backdrop1")
+            .attr("x", currNode.x - q_window_width / 2 - 110)
+            .attr("y", currNode.y - 160)
+            .attr("width", 400)
+            .attr("height", 100);
+          
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question1_text1")
+            .attr("x", currNode.x - q_window_width / 2 - 100)
+            .attr("dy", currNode.y - 140)
+            .text("Does " + currNode.name + " have one or more close friends who are black?");
+
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question1_text2")
+            .style("display", "none")
+            .attr("x", currNode.x - q_window_width / 2 - 100)
+            .attr("dy", currNode.y - 140)
+            .text("Are you also close friends with " + nodes[askedAbout].name + "'s black friends?");
+
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question1_text3")
+            .style("display", "none")
+            .attr("x", currNode.x - q_window_width / 2 - 100)
+            .attr("dy", currNode.y - 140)
+            .text("Do you know " + nodes[askedAbout].name + "'s black friends who are not your friends?");
+
+        drawBox(currNode);
+
+      }
+
+
+
+
+    } else if (currSlide == 14.5) {
+      
+        haveFriends = document.getElementById("haveBlackFriends")
+        friendFriends = document.getElementById("friendsBlackFriends")
+        knowFriends = document.getElementById("knowBlackFriends")
+        var qText = document.getElementById("question1_text1")
+        var qText2 = document.getElementById("question1_text2")
+
+
+          checked = false;
+          qText.style.display = "none";
+
+
+          if (haveFriends[0].checked) {
+
+            // If yes, ask follow up question
+            haveFriends.style.display = "none";
+            friendFriends.style.display = "block";
+            document.getElementById("question1_text2").style.display = "block";
+
+            checked = false;
+            currSlide += .1;
+          } else if (haveFriends[1].checked) {
+
+            // If no, skip
+            checked = true;
+            skipped = true;
+            currSlide += .5;
+            showNext();
+
+          } else {
+
+            console.log("line 1973")
+            promptNonresponse();
+            checked = true;
+          }
+
+    } else if (currSlide == 14.6) {
+
+      friendFriends = document.getElementById("friendsBlackFriends")
+      knowFriends = document.getElementById("knowBlackFriends")
+      var qText = document.getElementById("question1_text2")
+      var qText3 = document.getElementById("question1_text3")
+
+
+
+
+      if (friendFriends[1].checked) {
+
+        // If respondent is close to all friends, skip third question
+
+        
+        currSlide += .4;
+        checked = false;
+        skipped = true;
+        showNext();
+
+      } else {
+
+        if ($('input[name=friendsBlackFriends]:checked').length == 0 && !checked) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+
+        qText.style.display = "none";
+
+        // Otherwise, ask follow up question
+        friendFriends.style.display = "none";
+        knowFriends.style.display = "block";
+        document.getElementById("question1_text2").style.display = "none";
+        qText3.style.display = "block";
+
+
+
+          currSlide += .4;
+
+          checked = false;
+        }
+
+    }
+
+
+
+
+    } else if (currSlide == 15) {
+
+
+        if ($('input[name=knowBlackFriends]:checked').length == 0 && !checked && !skipped) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+
+          checked = false;
+          skipped = false;
+
+      var qWindow = document.getElementById("question1_window")
+
+      document.getElementById("slide15").style.display = "none";
+      //d3.select(".question_window").style.display = "none";
+      qWindow.style.display = "none";
+      document.getElementById("backdrop1").style.display = "none";
+
+      refreshRadio();
+
+      //TODO: gather data from check box for previous friend before unchecking
+
+
+       if (askedAbout == numFriends) {
+
+        d3.selectAll(".node").attr("opacity", 1);
+        d3.selectAll(".link").attr("display", "block");
+        d3.selectAll(".node").style("display", "none");
+        d3.selectAll(".link").style("display", "none");
+        d3.selectAll(".node").classed("fixed", function(d) {  
+         if (d.index > 0 ) {
+           d.fixed = false
+         }
+       });
+        
+
+        // Skip to slide 20 if no friends left
+        //document.getElementById("slide20").style.display = "block";
+        currSlide += 4;
+        skipped = true;
+        restart();
+        showNext();
+
+      } else {
+
+        // Questions about friend 2
+        askedAbout++;
+        currNode = nodes[askedAbout];
+        d3.selectAll(".node").attr("opacity", function(d) { return d.index == askedAbout ? 1 : .4 });
+
+
+        d3.select("svg").append("rect")
+            .attr("class", "q_window")
+            .attr("id", "question2_window")
+            .attr("rx", 2)
+            .attr("ry", 2)
+            .attr("width", q_window_width)
+            .attr("height", q_window_height)
+            .attr("x", nodes[askedAbout].x - q_window_width / 2)
+            .attr("y", nodes[askedAbout].y - q_window_height / 2)
+
+        d3.select("svg").append("rect")
+            .attr("class", "backdrop")
+            .attr("id", "backdrop2")
+            .attr("x", currNode.x - q_window_width / 2 - 110)
+            .attr("y", currNode.y - 160)
+            .attr("width", 400)
+            .attr("height", 100);
+          
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question2_text1")
+            .attr("x", nodes[askedAbout].x - q_window_width / 2 - 100)
+            .attr("dy", nodes[askedAbout].y - 140)
+            .text("Does " + nodes[askedAbout].name + " have one or more close friends who are black?");
+
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question2_text2")
+            .style("display", "none")
+            .attr("x", nodes[askedAbout].x - q_window_width / 2 - 100)
+            .attr("dy", nodes[askedAbout].y - 140)
+            .text("Are you also close friends with " + nodes[askedAbout].name + "'s black friends?");
+
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question2_text3")
+            .style("display", "none")
+            .attr("x", nodes[askedAbout].x - q_window_width / 2 - 100)
+            .attr("dy", nodes[askedAbout].y - 140)
+            .text("Do you know " + nodes[askedAbout].name + "'s black friends who are not your friends?");
+
+        drawBox(currNode);
+
+
+      }
+
+
+      }
+
+
+    } else if (currSlide == 15.5) {
+
+
+        haveFriends = document.getElementById("haveBlackFriends")
+        friendFriends = document.getElementById("friendsBlackFriends")
+        knowFriends = document.getElementById("knowBlackFriends")
+        var qText = document.getElementById("question2_text1")
+        var qText2 = document.getElementById("question2_text2")
+
+        
+
+         if ($('input[name=haveBlackFriends]:checked').length == 0 && !checked) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+
+          checked = false;
+          qText.style.display = "none";
+
+          if (haveFriends[0].checked) {
+
+            // If yes, ask follow up question
+            haveFriends.style.display = "none";
+            friendFriends.style.display = "block";
+            document.getElementById("question2_text2").style.display = "block";
+
+
+
+            currSlide += .1;
+          } else {
+            // If no, skip
+            skipped = true;
+            currSlide += .5;
+            showNext();
+          }
+      }
+
+
+    } else if (currSlide == 15.6) {
+
+
+      friendFriends = document.getElementById("friendsBlackFriends")
+      knowFriends = document.getElementById("knowBlackFriends")
+      var qText = document.getElementById("question2_text2")
+      var qText3 = document.getElementById("question2_text3")
+
+
+      if (friendFriends[1].checked) {
+
+        // If respondent is close to all friends, skip third question
+        qText.style.display = "none";
+        skipped = true;
+        currSlide += .4;
+        showNext();
+
+      } else {
+
+
+        if ($('input[name=friendsBlackFriends]:checked').length == 0 && !checked) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+
+
+            qText.style.display = "none";
+            checked = false;
+
+
+          // Otherwise, ask follow up question
+          friendFriends.style.display = "none";
+          knowFriends.style.display = "block";
+          document.getElementById("question2_text2").style.display = "none";
+          qText3.style.display = "block";
+
+
+
+            currSlide += .4;
+        }
+
+      }
+
+    } else if (currSlide == 16) {
+
+
+        if ($('input[name=knowBlackFriends]:checked').length == 0 && !checked && !skipped) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+          skipped = false;
+          checked = false;
+
+      var qWindow = document.getElementById("question2_window")
+      var qText = document.getElementById("question2_text1")
+
+
+      document.getElementById("slide16").style.display = "none";
+      qWindow.style.display = "none";
+      qText.style.display = "none";
+      document.getElementById("backdrop2").style.display = "none";
+     
+
+
+      refreshRadio();
+
+
+       if (askedAbout == numFriends) {
+
+        d3.selectAll(".node").attr("opacity", 1);
+        d3.selectAll(".link").attr("display", "block"); 
+        d3.selectAll(".node").style("display", "none");
+        d3.selectAll(".link").style("display", "none");
+        d3.selectAll(".node").classed("fixed", function(d) {  
+          if (d.index > 0 ) {
+            d.fixed = false
+          }
+        });
+
+        // Skip to slide 20 if no friends left
+       // document.getElementById("slide20").style.display = "block";
+        currSlide += 3;
+        skipped = true;
+        restart();
+        showNext();
+
+
+      } else {
+
+      // Questions about friend 3 
+      askedAbout++;
+      var currNode = nodes[askedAbout];
+      d3.selectAll(".node").attr("opacity", function(d) { return d.index == askedAbout ? 1 : .4 });
+
+
+        d3.select("svg").append("rect")
+            .attr("class", "q_window")
+            .attr("id", "question3_window")
+            .attr("rx", 2)
+            .attr("ry", 2)
+            .attr("width", q_window_width)
+            .attr("height", q_window_height)
+            .attr("x", nodes[askedAbout].x - q_window_width / 2)
+            .attr("y", nodes[askedAbout].y - q_window_height / 2)
+
+        d3.select("svg").append("rect")
+            .attr("class", "backdrop")
+            .attr("id", "backdrop3")
+            .attr("x", currNode.x - q_window_width / 2 - 110)
+            .attr("y", currNode.y - 160)
+            .attr("width", 400)
+            .attr("height", 100);
+          
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question3_text1")
+            .attr("x", nodes[askedAbout].x - q_window_width / 2 - 100)
+            .attr("dy", nodes[askedAbout].y - 140)
+            .text("Does " + nodes[askedAbout].name + " have one or more close friends who are black?");
+
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question3_text2")
+            .style("display", "none")
+            .attr("x", nodes[askedAbout].x - q_window_width / 2 - 100)
+            .attr("dy", nodes[askedAbout].y - 140)
+            .text("Are you also close friends with " + nodes[askedAbout].name + "'s black friends?");
+
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question3_text3")
+            .style("display", "none")
+            .attr("x", nodes[askedAbout].x - q_window_width / 2 - 100)
+            .attr("dy", nodes[askedAbout].y - 140)
+            .text("Do you know " + nodes[askedAbout].name + "'s black friends who are not your friends?");
+
+      drawBox(currNode);
+
+    }
+
+  }
+
+
+    } else if (currSlide == 16.5) {
+
+        haveFriends = document.getElementById("haveBlackFriends")
+        friendFriends = document.getElementById("friendsBlackFriends")
+        knowFriends = document.getElementById("knowBlackFriends")
+        var qText = document.getElementById("question3_text1")
+        var qText2 = document.getElementById("question3_text2")
+
+       
+
+         if ($('input[name=haveBlackFriends]:checked').length == 0 && !checked) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+
+          checked = false;
+         qText.style.display = "none";
+
+          if (haveFriends[0].checked) {
+
+            // If yes, ask follow up question
+            haveFriends.style.display = "none";
+            friendFriends.style.display = "block";
+            document.getElementById("question3_text2").style.display = "block";
+
+
+
+            currSlide += .1;
+          } else {
+            // If no, skip
+            skipped = true;
+            currSlide += .5;
+            showNext();
+          }
+        }
+
+    } else if (currSlide == 16.6) {
+
+
+      friendFriends = document.getElementById("friendsBlackFriends")
+      knowFriends = document.getElementById("knowBlackFriends")
+      var qText = document.getElementById("question3_text2")
+      var qText3 = document.getElementById("question3_text3")
+
+      
+
+
+      if (friendFriends[1].checked) {
+
+        // If respondent is close to all friends, skip third question
+        qText.style.display = "none";
+        skipped = true;
+        currSlide += .4;
+        showNext();
+
+      } else {
+
+        if ($('input[name=friendsBlackFriends]:checked').length == 0 && !checked) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+
+              qText.style.display = "none";
+              checked = false;
+
+
+
+          // Otherwise, ask follow up question
+          friendFriends.style.display = "none";
+          knowFriends.style.display = "block";
+          document.getElementById("question3_text2").style.display = "none";
+          qText3.style.display = "block";
+
+
+
+            currSlide += .4;
+        }
+
+      }
+
+    } else if (currSlide == 17) {
+
+
+        if ($('input[name=knowBlackFriends]:checked').length == 0 && !checked && !skipped) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+          checked = false;
+          skipped = false;
+
+      var qWindow = document.getElementById("question3_window");
+
+
+      document.getElementById("slide17").style.display = "none";
+      qWindow.style.display = "none";
+      document.getElementById("backdrop3").style.display = "none";
+
+      refreshRadio();
+      
+       if (askedAbout == numFriends) {
+
+        // Skip to slide 20 if no friends left
+        d3.selectAll(".node").attr("opacity", 1);
+        d3.selectAll(".link").attr("display", "block"); 
+        d3.selectAll(".node").style("display", "none");
+        d3.selectAll(".link").style("display", "none");
+        d3.selectAll(".node").classed("fixed", function(d) {  
+          if (d.index > 0 ) {
+            d.fixed = false
+          }
+         });
+
+
+       // document.getElementById("slide20").style.display = "block";
+        currSlide += 2;
+        skipped = true;
+
+        restart();
+
+        showNext();
+
+
+      } else {
+
+        // Questions about friend 4
+        askedAbout++;
+        var currNode = nodes[askedAbout];
+        d3.selectAll(".node").attr("opacity", function(d) { return d.index == askedAbout ? 1 : .4 });
+        
+
+        d3.select("svg").append("rect")
+            .attr("class", "q_window")
+            .attr("id", "question4_window")
+            .attr("rx", 2)
+            .attr("ry", 2)
+            .attr("width", q_window_width)
+            .attr("height", q_window_height)
+            .attr("x", nodes[askedAbout].x - q_window_width / 2)
+            .attr("y", nodes[askedAbout].y - q_window_height / 2)
+
+        d3.select("svg").append("rect")
+            .attr("class", "backdrop")
+            .attr("id", "backdrop4")
+            .attr("x", currNode.x - q_window_width / 2 - 110)
+            .attr("y", currNode.y - 160)
+            .attr("width", 400)
+            .attr("height", 100);
+          
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question4_text1")
+            .attr("x", nodes[askedAbout].x - q_window_width / 2 - 100)
+            .attr("dy", nodes[askedAbout].y - 140)
+            .text("Does " + nodes[askedAbout].name + " have one or more close friends who are black?");
+
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question4_text2")
+            .style("display", "none")
+            .attr("x", nodes[askedAbout].x - q_window_width / 2 - 100)
+            .attr("dy", nodes[askedAbout].y - 140)
+            .text("Are you also close friends with " + nodes[askedAbout].name + "'s black friends?");
+
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question4_text3")
+            .style("display", "none")
+            .attr("x", nodes[askedAbout].x - q_window_width / 2 - 100)
+            .attr("dy", nodes[askedAbout].y - 140)
+            .text("Do you know " + nodes[askedAbout].name + "'s black friends who are not your friends?");
+
+        drawBox(currNode);
+
+      }
+
+      }
+
+    } else if (currSlide == 17.5) {
+
+        haveFriends = document.getElementById("haveBlackFriends")
+        friendFriends = document.getElementById("friendsBlackFriends")
+        knowFriends = document.getElementById("knowBlackFriends")
+        var qText = document.getElementById("question4_text1")
+        var qText2 = document.getElementById("question4_text2")
+
+        
+
+         if ($('input[name=haveBlackFriends]:checked').length == 0 && !checked) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+
+          checked = false;
+          qText.style.display = "none";
+
+          if (haveFriends[0].checked) {
+
+            // If yes, ask follow up question
+            haveFriends.style.display = "none";
+            friendFriends.style.display = "block";
+            document.getElementById("question4_text2").style.display = "block";
+
+
+
+            currSlide += .1;
+          } else {
+            // If no, skip
+            skipped = true;
+            currSlide += .5;
+            showNext();
+          }
+        }
+
+
+    } else if (currSlide == 17.6) {
+
+
+      friendFriends = document.getElementById("friendsBlackFriends")
+      knowFriends = document.getElementById("knowBlackFriends")
+      var qText = document.getElementById("question4_text2")
+      var qText3 = document.getElementById("question4_text3")
+
+
+
+      if (friendFriends[1].checked) {
+
+        // If respondent is close to all friends, skip third question
+        qText.style.display = "none";
+        skipped = true;
+        currSlide += .4;
+        showNext();
+
+      } else {
+
+        if ($('input[name=friendsBlackFriends]:checked').length == 0 && !checked) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+
+            qText.style.display = "none";
+            checked = false;
+
+
+
+          // Otherwise, ask follow up question
+          friendFriends.style.display = "none";
+          knowFriends.style.display = "block";
+          document.getElementById("question4_text2").style.display = "none";
+          qText3.style.display = "block";
+
+
+
+            currSlide += .4;
+        }
+      }
+
+
+
+    } else if (currSlide == 18) {
+
+
+        if ($('input[name=knowBlackFriends]:checked').length == 0 && !checked && !skipped) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+          skipped = false;
+          checked = false;
+
+      var qWindow = document.getElementById("question4_window");
+      var qText1 = document.getElementById("question4_text1")
+
+      document.getElementById("slide18").style.display = "none";
+      qWindow.style.display = "none";
+      document.getElementById("backdrop4").style.display = "none";
+
+      refreshRadio();
+
+
+       if (askedAbout == numFriends) {
+
+        // Skip to slide 20 if no friends left
+        d3.selectAll(".node").attr("opacity", 1);
+        d3.selectAll(".link").attr("display", "block"); 
+        qText1.style.display = "none";
+        d3.selectAll(".node").style("display", "none");
+        d3.selectAll(".link").style("display", "none");
+        d3.selectAll(".node").classed("fixed", function(d) {  
+        if (d.index > 0 ) {
+          d.fixed = false
+        }
+      });
+
+        //document.getElementById("slide20").style.display = "block";
+
+        currSlide += 1;
+        restart();
+        skipped = true;
+        showNext();
+
+      } else {
+
+      // Questions about friend 5
+      askedAbout++;
+      var currNode = nodes[askedAbout];
+      d3.selectAll(".node").attr("opacity", function(d) { return d.index == askedAbout ? 1 : .4 });
+
+
+        d3.select("svg").append("rect")
+            .attr("class", "q_window")
+            .attr("id", "question5_window")
+            .attr("rx", 2)
+            .attr("ry", 2)
+            .attr("width", q_window_width)
+            .attr("height", q_window_height)
+            .attr("x", nodes[askedAbout].x - q_window_width / 2)
+            .attr("y", nodes[askedAbout].y - q_window_height / 2);
+
+        d3.select("svg").append("rect")
+            .attr("class", "backdrop")
+            .attr("id", "backdrop5")
+            .attr("x", currNode.x - q_window_width / 2 - 110)
+            .attr("y", currNode.y - 160)
+            .attr("width", 400)
+            .attr("height", 100);
+          
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question5_text1")
+            .attr("x", nodes[askedAbout].x - q_window_width / 2 - 100)
+            .attr("dy", nodes[askedAbout].y - 140)
+            .text("Does " + nodes[askedAbout].name + " have one or more close friends who are black?");
+
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question5_text2")
+            .style("display", "none")
+            .attr("x", nodes[askedAbout].x - q_window_width / 2 - 100)
+            .attr("dy", nodes[askedAbout].y - 140)
+            .text("Are you also close friends with " + nodes[askedAbout].name + "'s black friends?");
+
+        d3.select("svg").append("text")
+            .attr("class", "slideText")
+            .attr("id", "question5_text3")
+            .style("display", "none")
+            .attr("x", nodes[askedAbout].x - q_window_width / 2 - 100)
+            .attr("dy", nodes[askedAbout].y - 140)
+            .text("Do you know " + nodes[askedAbout].name + "'s black friends who are not your friends?");
+
+      drawBox(currNode);
+
+    }
+  }
+
+    } else if (currSlide == 18.5) {
+
+        haveFriends = document.getElementById("haveBlackFriends")
+        friendFriends = document.getElementById("friendsBlackFriends")
+        knowFriends = document.getElementById("knowBlackFriends")
+        var qText = document.getElementById("question5_text1")
+        var qText2 = document.getElementById("question5_text2")
+
+        
+
+         if ($('input[name=haveBlackFriends]:checked').length == 0 && !checked) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+
+          checked = false;
+          qText.style.display = "none";
+
+          if (haveFriends[0].checked) {
+
+            // If yes, ask follow up question
+            haveFriends.style.display = "none";
+            friendFriends.style.display = "block";
+            document.getElementById("question5_text2").style.display = "block";
+
+
+
+            currSlide += .1;
+          } else {
+            // If no, skip
+            skipped = true;
+            currSlide += .5;
+            showNext();
+          }
+        }
+
+    } else if (currSlide == 18.6) {
+
+
+      friendFriends = document.getElementById("friendsBlackFriends")
+      knowFriends = document.getElementById("knowBlackFriends")
+      var qText = document.getElementById("question5_text2")
+      var qText3 = document.getElementById("question5_text3")
+
+      
+
+
+      if (friendFriends[1].checked) {
+
+        // If respondent is close to all friends, skip third question
+        qText.style.display = "none";
+        skipped = true;
+        currSlide += .4;
+        showNext();
+
+      } else {
+
+        if ($('input[name=friendsBlackFriends]:checked').length == 0 && !checked) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+
+            qText.style.display = "none";
+            checked = false;
+
+
+
+          // Otherwise, ask follow up question
+          friendFriends.style.display = "none";
+          knowFriends.style.display = "block";
+          document.getElementById("question5_text2").style.display = "none";
+          qText3.style.display = "block";
+
+
+
+            currSlide += .4;
+        }
+      }
+
+
+
+    } else if (currSlide == 19) {
+
+
+        if ($('input[name=knowBlackFriends]:checked').length == 0 && !checked && !skipped) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
+          skipped = false;
+          checked = false;
+
+
+        currSlide++;
+        
+      //  if (randomnumber % 2 != 0) {
+       // 	showNext();
+     //   }
+
+		if (numFriends == 5) {
+        	var qWindow = document.getElementById("question5_window");
+      
+        	qWindow.style.display = "none";
+     		 document.getElementById("backdrop5").style.display = "none";
+
+        	refreshRadio();
+		}
+
+        d3.selectAll(".node").style("opacity", 1);
+        d3.selectAll(".node").style("display", "none");
+        d3.selectAll(".link").attr("display", "block"); 
+        d3.selectAll(".link").style("display", "none");
+        d3.selectAll(".node").classed("fixed", function(d) {  
+          if (d.index > 0 ) {
+            d.fixed = false
+          }
+        });
+
+         // If not promised statistics about social network, do not show this slide
+      if (randomnumber % 2 != 0) {
+        showNext();
+      } else {
+
+        // Statistics. Jump here if all friends have been asked about.
+        document.getElementById("slide19").style.display = "none";
+        document.getElementById("slide20").style.display = "block";
+        var doc = document.getElementById("slide20")
+
+        var size = d3.select("svg").append("text")
+          .attr("class", "slideText")
+          .attr("id", "size_statistic")
+          .attr("x", center - textWidth / 2)
+          .attr("y", text_offset_top + 100)
+          .text(function() {
+            if (numFriends == 1) { //TOASK: should we account for there being 0 friends?
+              return "1) Your social network is smaller than the network of most Americans. 2% of Americans also feel close to only one person. 98% feel close to more people."
+            } else if (numFriends == 2) {
+              return "1) Your social network is smaller than the network of most Americans. 5% of Americans also feel close to two people. 93% feel close to more people and 2% feel close to only one person."
+            } else if (numFriends == 3) {
+              return "1) Your social network is smaller than the network of most Americans. 7% of Americans also feel close to three people. 86% feel close to more people and 7% feel close to fewer people."
+            } else if (numFriends == 4) {
+              return "1) Your social network is as large as the network of most Americans. 51% of Americans also feel close to four people. 35% feel close to more people and 14% feel close to fewer people."
+            } else if (numFriends == 5) {
+              return "1) Your social network is larger than the network of most Americans. 35% of Americans also feel close to five or more people. 65% feel close to fewer people."
+            }
+          })
+          .call(wrap, textWidth);
+
+
+          // Count the links
+          numLinks = 0;
+          links.forEach(function(l) {
+            numLinks++;
+          });
+          numLinks -= numFriends;
+
+          var density = 0;
+
+          // Calculate the density
+          if (numFriends == 1 || numLinks == 2) {
+            density = numLinks;
+          } else if (numFriends == 3) {
+            density = numLinks / 3;
+          } else if (numFriends == 4) {
+            density = numLinks / 6;
+          } else if (numFriends == 5) {
+            density = numLinks / 10;
+          }
+
+
+        var dens  = d3.select("svg").append("text")
+          .attr("class", "slideText")
+          .attr("id", "density_statistic")
+          .attr("x", center - textWidth / 2)
+          .attr("y", text_offset_top + 180)
+          .text(function() {
+            if (density < .5) { //TOASK: should we account for there being 0 friends?
+              return "2) Your social network is only loosely connected. Fewer than half of the people in your network know each other. This is also the case in the network of less than 35% of all Americans."
+            } else if (density >= .5 && density < 1) {
+              return "2) Your social network is closely connected. More than half of the people in your network know each other.  But not everyone knows everyone. This is also the case in the network of less 33% of all Americans. In the network of 35% all Americans fewer than half of the people know each other."
+            } else if (density == 1) {
+              return "2) Your social network is very closely connected. All of the people in your network know each other. This is also the case in the network of 32% of all Americans. 68% of all Americans have networks that are more loosely connected than your network."
+            } 
+          })
+          .call(wrap, textWidth);
+
+          
+          //TODO send information about server
+
+          var respondentRace = nodes[0].race;
+          var diffRace = false;
+          console.log("respondent's race " + respondentRace);
+
+          nodes.forEach(function(n) {
+            var friendRace = n.race;
+            if (friendRace.length > respondentRace.length) {
+              diffRace = true;
+            } else if (respondentRace.indexOf("white") == -1 && friendRace.indexOf("white") !== -1) {
+                diffRace = true;
+            } else if (respondentRace.indexOf("black") == -1 && friendRace.indexOf("black") !== -1) {
+              diffRace = true;
+            } else if (respondentRace.indexOf("asian") == -1 && friendRace.indexOf("asian") !== -1) {
+              diffRace = true;
+            } else if (respondentRace.indexOf("hispanic") == -1 && friendRace.indexOf("hispanic") !== -1) {
+              diffRace = true;
+            } else if (respondentRace.indexOf("other") == -1 && friendRace.indexOf("other") !== -1) {
+              diffRace = true;
+            }
+          });
+
+        var racial  = d3.select("svg").append("text")
+          .attr("class", "slideText")
+          .attr("id", "race_statistic")
+          .attr("x", center - textWidth / 2)
+          .attr("y", text_offset_top + 260)
+          .text(function() {
+            if (diffRace) { //TOASK: what if there is no information about the respondent or the friends' races?
+              return "3) Your social network is more diverse than the network of most Americans. 82% of all Americans feel only close to people of their own race. You belong to the 18% of Americans who feel close to people from other races."
+            } else {
+              return "3) Just as 82% of all Americans, you feel close to only people of your own race. Only 18% of Americans feel close to people from multiple racial groups."
+            } 
+          })
+          .call(wrap, textWidth);
+
+        var note = d3.select("svg").append("text")
+          .attr("class", "questionText")
+          .attr("id", "statistics_note")
+          .attr("x", center - textWidth / 2)
+          .attr("y", bodyHeight - 30)
+          .style("fill", "#AAA")
+          .text("Comparisons are based on the \"Portraits of American Life Study\" 2006");
+
+
+
+
+      }
+
+        restart();
+
+      }
+
+    } else if (currSlide == 20) {
+    
+    	if (randomnumber % 2 == 0) {
+    		document.getElementById("size_statistic").style.display = "none";
+    		document.getElementById("density_statistic").style.display = "none";
+    		document.getElementById("race_statistic").style.display = "none";
+        document.getElementById("statistics_note").style.display = "none";
+    	}
+
+      document.getElementById("slide20").style.display = "none";
+     // document.getElementById("slide21").style.display = "block";
+      
+    	var enj = document.getElementById("userEnjoy");
+    	enj.style.left = string_l + "px";
+     	enj.style.top = string_t;
+     	enj.style.display = "block";
+
+      currSlide++;
+
+    } else if (currSlide == 21) {
+
+
+      // If user has not selected an option, alert with popup
+      if ($('input[name=userEnj]:checked').length == 0 && checked == false) {
+
+        promptNonresponse();
+        checked = true;
+
+
+      } else {
+        //TODO: collect data before going on
+        checked = false;
+        document.getElementById("userEnjoy").style.display = "none";
+
+        var like = document.getElementById("userLikelihood");
+        like.style.left = string_l + "px";
+        like.style.top = string_t;
+        like.style.display = "block";
+        currSlide++;
+      }
+
+    } else if (currSlide == 22) {
+
+
+      // If user has not selected an option, alert with popup
+      if ($('input[name=userLike]:checked').length == 0 && checked == false) {
+
+        promptNonresponse();
+        checked = true;
+
+
+      } else {
+        //TODO: collect data before going on
+        checked = false;
+        document.getElementById("userLikelihood").style.display = "none";
+
+        var ex = document.getElementById("userExhaust");
+        ex.style.left = string_l + "px";
+        ex.style.top = string_t;
+        ex.style.display = "block";
+        currSlide++;
+      }
+
+    } else if (currSlide == 23) {
+      // If user has not selected an option, alert with popup
+      if ($('input[name=userEx]:checked').length == 0 && checked == false) {
+
+        promptNonresponse();
+        checked = true;
+
+
+      } else {
+        checked = false;
+        document.getElementById("userExhaust").style.display = "none";
+        document.getElementById("slide24").style.display = "block";
+        // TODO: collect / record the total time taken
+        var d = new Date();
+        endTime = d.getTime();
+
+
+      }
+    }
+
+
+  }
+  //TODO: text-alignment is off for user questions on Safari
+  //TODO: fix example picture
+
+    </script>
+  
+
+
+<div class="example_picture"> 
+  <img src="example_network.png" alt="Example network" id="example_net">
+</div>
+
+<div class="input-group" display="none" id="gender" method="get">
+  <form id="userGender" display="none">
+    <span class="slideText">Are you a man or a woman?</span><br><br>
+    <input type="radio" name="userGender" value="man"><span class="questionText"> Man</span><br>
+    <input type="radio" name="userGender" value="woman"><span class="questionText"> Woman</span>
+  </form>
+</div>
+
+<div class="input-group" display="none" id="age" method="get" position="absolute">
+  <span class="slideText">In which year were you born?</span><br>
+  <span class="slideText">Please enter a year between 1900 and 1997. Click next to proceed.</span><br>
+  <input type="text" size="10" id="userAge" name="userAge" placeholder="Year"><br>
+  <!--<button type="submit" value="Age">Enter-->
+</div>
+
+<div class="input-group" display="none" id="userEd" method="get">
+  <form id="userEdu">
+    <span class="slideText">What is the highest education that you completed?</span><br><br>
+    <input type="radio" class="slideText" name="uEdu" value="less_highschool"><span class="questionText"> Less than high school</span><br>
+    <input type="radio" name="uEdu" value="highschool"><span class="questionText"> High school </span><br>
+    <input type="radio" name="uEdu" value="college"><span class="questionText"> Some college </span><br>
+    <input type="radio" name="uEdu" value="college_plus"><span class="questionText"> Bachelors degree or higher</span>
+  </form>
+</div>
+
+<div class="input-group" display="none" id="areHisp" method="get">
+  <form id="areHispanic">
+    <span class="slideText">Are you Hispanic, Latino/a, or of Spanish origin?</span><br>
+    <input type="radio" name="areHispanic" value="yes"><span class="questionText"> Yes</span><br>
+    <input type="radio" name="areHispanic" value="no"><span class="questionText"> No</span>
+  </form>
+</div>
+
+<div class="input-group" display="none" id="race" method="get">
+  <form id="userRace">
+    <span class="slideText">What is your race? (One or more categories may be selected)</span><br><br>
+    <input type="checkbox" class="slideText" name="uRace" value="white"><span class="questionText"> White</span><br>
+    <input type="checkbox" name="uRace" value="black"><span class="questionText"> Black </span><br>
+    <input type="checkbox" name="uRace" value="native"><span class="questionText"> American Indian, Alaska Native or Native Hawaiian </span><br>
+    <input type="checkbox" name="uRace" value="asian"><span class="questionText"> Asian </span><br>
+    <input type="checkbox" name="uRace" value="other"><span class="questionText"> Other</span>
+  </form>
+</div>
+
+
+<div class="input-group" display="none" id="name_input" method="get" onsubmit="addFriend()">
+  <span class="input-group-addon"></span>
+  <input type="text" id="friendNameID"name="friendName" class="form-control" placeholder="Name" maxlength="25">
+  <button type="submit" style="vertical-align:super" value="Enter" onclick="addFriend()">Enter
+</div>
+
+
+<!--<form onsubmit="addFriend">
+First name: <input type="text" name="fname"><br>
+<input type="submit" value="Submit">-->
+
+
+<div class="input-group" display="none" id="blackFriends" method="get">
+  <form id="haveBlackFriends">
+    <input type="radio" class="slideText" name="haveBlackFriends" value="yes" onclick="yesBlackFriends()"> Yes<br>
+    <input type="radio" name="haveBlackFriends" value="no" onclick="noBlackFriends()"> No
+  </form>
+  <form id="friendsBlackFriends" display="none">
+    <input type="radio" name="friendsBlackFriends" value="some"> Yes, with some of them<br>
+    <input type="radio" name="friendsBlackFriends" value="all"> Yes, with all of them<br>
+    <input type="radio" name="friendsBlackFriends" value="no"> No
+  </form>
+  <form id="knowBlackFriends" display="none">
+    <input type="radio" name="knowBlackFriends" value="some"> Yes, some of them<br>
+    <input type="radio" name="knowBlackFriends" value="all"> Yes, all of them<br>
+    <input type="radio" name="knowBlackFriends" value="no"> No
+  </form>
+</div>
+
+<div class="popop_box" id="nonresponse_box">
+  <div class="popup_box" id="popup">
+        <p class="popup_text">We noticed that you didn't answer this question. It would very helpful for our research if you did. Please feel free to either give an answer or to go to the next question by clicking 'Next' again.</p>
+        <button class="btn btn-default" onclick="closePopup()">Close</button>
+  </div>
+</div>
+
+<div class="input-group" display="none" id="userEnjoy" method="get">
+  <form id="userEnj" display="none">
+    <span class="slideText">How much did you enjoy answering this survey?</span><br><br>
+    <input type="radio" name="uEnj" value="great_deal"><span class="questionText">  A great deal</span><br>
+    <input type="radio" name="uEnj" value="a_lot"><span class="questionText">  A lot </span><br>
+    <input type="radio" name="uEnj" value="moderately"><span class="questionText">  Moderately </span><br>
+    <input type="radio" name="uEnj" value="a_little"><span class="questionText">  A little</span><br>
+    <input type="radio" name="uEnj" value="not_at_all"><span class="questionText">  Not at all</span>
+  </form>
+</div>
+
+<div class="input-group" display="none" id="userLikelihood" method="get">
+  <form id="userLike">
+    <span class="slideText">How likely is it that you will participate in another survey like this about your social network?</span><br><br>
+    <input type="radio" name="uLike" value="extremely_likely"><span class="questionText">  Extremely likely</span><br>
+    <input type="radio" name="uLike" value="very_likely"><span class="questionText">  Very likely</span><br>
+    <input type="radio" name="uLike" value="moderately_likely"><span class="questionText">  Moderately likely </span><br>
+    <input type="radio" name="uLike" value="a_little_likely"><span class="questionText">  A little likely </span><br>
+    <input type="radio" name="uLike" value="not_very_likely"><span class="questionText">  Not very likely</span>
+  </form>
+</div>
+
+<div class="input-group" display="none" id="userExhaust" method="get">
+  <form id="userEx">
+    <span class="slideText">How exhausting was completing this survey?</span><br><br>
+    <input type="radio" name="uEx" value="extremely_exh"><span class="questionText">  Extremely exhausting</span><br>
+    <input type="radio" name="uEx" value="very_exh"><span class="questionText">  Very exhausting</span><br>
+    <input type="radio" name="uEx" value="moderately_exh"><span class="questionText">  Moderately exhausting</span><br>
+    <input type="radio" name="uEx" value="a_little_exh"><span class="questionText">  A little exhausting</span><br>
+    <input type="radio" name="uEx" value="not_at_all_exh"><span class="questionText">  Not at all exhausting</span>
+  </form>
+</div>
+
+
+<div id="NextDiv">
+  <input type="button" 
+    class="btn btn-default" 
+    value="Next"
+    id="Next"
+    onclick="showNext()"
+    top="150px"
+    left="100px"/>
+</div>
+
+
+  </body>
+</html>

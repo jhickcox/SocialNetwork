@@ -1,0 +1,47 @@
+body {
+  text-rendering: optimizeLegibility;
+  margin: 0;
+}
+
+.slide {
+	fill: #E3DAC9;
+	z-index: 0;
+}
+
+.titleText {
+	font-size: 24px;
+	text-align: center;
+}
+
+.slideText {
+	font-size: 18px;
+	text-align: center;
+	word-wrap: break-all;
+	width: 600px;
+}
+
+.node {
+	background: blue;
+	stroke: #fff;
+	stroke-width: 1.5;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+
+
+#Next {
+  	height: 30px;
+  	width: 70px;
+    display: box;
+  	position: absolute;
+  	top: 400px;
+  	left: 850px;
+  	text-align: center;
+  	background-color: beige;
+  	border-radius: 5px;
+  	pointer-events: all;
+  	z-index: 10;
+}
