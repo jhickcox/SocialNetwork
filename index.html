@@ -451,7 +451,7 @@
         .attr("class", "slideText")
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top)
-        .text("Who knows whom? Which of these people know each other? To indicate that two persons know each other, click on the name of the first person and then on the name of the second person. This will create a line between the two") //TODO: add example
+        .text("Which of these people know each other? To indicate that two persons know each other, click on the name of the first person and then on the name of the second person. This will create a line between the two") //TODO: add example
       .call(wrap, textWidth)
 
 
@@ -1178,7 +1178,10 @@ var slide_17 = d3.select("svg").append("g")
   }
 
 
-
+  function friendPromptNonresponse() {
+    document.getElementById("fewFriends_box").style.display = "block";
+    document.getElementById("friendPopup").style.display = "block";
+  }
 
 
   function closePopup() {
@@ -1187,6 +1190,11 @@ var slide_17 = d3.select("svg").append("g")
     document.getElementById("popup").style.display = "none";
   }
 
+  function closeFriendPopup() {
+
+    document.getElementById("fewFriends_box").style.display = "none";
+    document.getElementById("friendPopup").style.display = "none";
+  }
 
 
 
@@ -1410,6 +1418,17 @@ var slide_17 = d3.select("svg").append("g")
           document.getElementById("userRace").style.display = "none";
           document.getElementById("areHispanic").style.display = "none";
 
+          var l = center - 330;
+          var le = l.toString();
+          var pic = document.getElementById("example_net");
+
+          pic.style.left = le + "px";
+          pic.style.top = "60px";
+          pic.style.position = "absolute";
+
+          pic.style.display = "block";
+
+
           currSlide += 2;
 
 
@@ -1467,12 +1486,17 @@ var slide_17 = d3.select("svg").append("g")
         document.getElementById("areHispanic").style.display = "none";
         document.getElementById("slide105").style.display = "block";
         document.getElementById("userRace").style.display = "none";
-        document.getElementById("example_net").style.display = "block";
-       // var top = center - 180;
-       // pic.style.top = top.toString();
-       // pic.style.display = "block";
         currSlide++;
         checked = false;
+
+          var l = center - 330;
+          var le = l.toString();
+          var pic = document.getElementById("example_net");
+
+          pic.style.left = le + "px";
+          pic.style.top = "60px";
+
+          pic.style.display = "block";
       }
 
 
@@ -1501,10 +1525,18 @@ var slide_17 = d3.select("svg").append("g")
 
     } else if (currSlide == 3) {
 
-      document.getElementById("slide3").style.display = "none";
-      document.getElementById("slide4").style.display = "block";
-      document.getElementById("name_input").style.display = "none";
-      currSlide++;
+      if (numFriends < 5 && checked == false) {
+        checked = true;
+        console.log("fewer than 5 friends")
+        friendPromptNonresponse();
+
+      } else {
+        checked = false;
+        document.getElementById("slide3").style.display = "none";
+        document.getElementById("slide4").style.display = "block";
+        document.getElementById("name_input").style.display = "none";
+        currSlide++;
+      }
 
 
 
@@ -1682,6 +1714,10 @@ var slide_17 = d3.select("svg").append("g")
         .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 3 + (bar4_target_width / 2) - 80)
         .attr("y", timebar_offset_y - timebar_label_margin - 6);
 
+
+      document.getElementById("before_pic").style.display = "block";
+      document.getElementById("after_pic").style.display = "block";
+
       d3.selectAll(".node").classed("fixed", function(d) { d.fixed = true});
       d3.selectAll(".node").attr("opacity", function(d) { if (d.index == 0) { return .4}});
       d3.selectAll(".link").attr("display", "none");
@@ -1722,181 +1758,245 @@ var slide_17 = d3.select("svg").append("g")
 
 //TODO: add 'error' message if a node is not within the bounds of the label
 //TODO: check link fade out before link creation
-//TODO: add box to individual friend questions
-      nodes.forEach(function(n) { 
-        if (n.index > 0) {
-          if (n.x < timebar_offset_x + bar4_target_width && n.y > timebar_offset_y) {
-            n.freq = "daily";
-            console.log("daily: " + n.name );
-          } else if (n.x < timebar_offset_x + bar4_target_width * 2 + timebar_margin && n.y > timebar_offset_y) {
-            n.freq = "weekly";
-            console.log("weekly: " + n.name);
-          } else if (n.x < timebar_offset_x + (bar4_target_width + timebar_margin) * 2 + bar4_target_width && n.y > timebar_offset_y) {
-           n.freq = "monthly";
-            console.log("montly: " + n.name);
-          } else if (n.y > timebar_offset_y) {
-            n.freq = "less_monthly"
-            console.log("less_monthly: " + n.name);
-          }
-        }
-      }); 
-      
 
-      d3.selectAll(".node").classed("fixed", function(d) { 
-        if (d.index > 0 ) {
-          d.fixed = false
+  var nodeAbove = false;
+
+      nodes.forEach(function(n) {
+        if (n.index > 0) {
+          if (n.y < timebar_offset_y) {
+            nodeAbove = true;
+            console.log(nodeAbove);
+          } 
         }
       });
 
-      restart();
+      console.log("final: " + nodeAbove)
+      if (nodeAbove && !checked) {
+        promptNonresponse();
+        checked = true;
+      } else {
 
 
-      d3.selectAll(".link").attr("display", "block");     
-      d3.selectAll(".node").attr("opacity", function(d) { if (d.index == 0) { return 1}});
+        nodes.forEach(function(n) { 
+          if (n.index > 0) {
+            if (n.x < timebar_offset_x + bar4_target_width && n.y > timebar_offset_y) {
+              n.freq = "daily";
+              console.log("daily: " + n.name );
+            } else if (n.x < timebar_offset_x + bar4_target_width * 2 + timebar_margin && n.y > timebar_offset_y) {
+              n.freq = "weekly";
+              console.log("weekly: " + n.name);
+            } else if (n.x < timebar_offset_x + (bar4_target_width + timebar_margin) * 2 + bar4_target_width && n.y > timebar_offset_y) {
+             n.freq = "monthly";
+              console.log("montly: " + n.name);
+            } else if (n.y > timebar_offset_y) {
+              n.freq = "less_monthly"
+              console.log("less_monthly: " + n.name);
+            } 
+          }
+        }); 
 
-      setTimeout(function() {
-        d3.selectAll(".node").classed("fixed", function(d) { d.fixed = true});
-        d3.selectAll(".link").attr("display", "none");  
-        d3.selectAll(".node").attr("opacity", function(d) { return d.index == 0 ? .4 : 1 });
-      },1500);
+        checked = false;
+        
 
-      
-      document.getElementById("labelBar1").style.display = "none";
-      document.getElementById("timeBar").style.display = "none";
-      document.getElementById("slide12").style.display = "none";
-      document.getElementById("fourBar").style.display = "block";
-      document.getElementById("slide1200").style.display = "block";
-    var labelBar = d3.select("svg").append("g")
-        .style("display", "block")
-        .attr("id", "labelBar2");
+        d3.selectAll(".node").classed("fixed", function(d) { 
+          if (d.index > 0 ) {
+            d.fixed = false
+          }
+        });
 
-       labelBar.append("rect")
-        .attr("class", "bar_label")
-        .attr("id", "several_lab")     
-        .attr("rx", 4)
-        .attr("ry", 4)
-        .attr("x", timebar_offset_x)
-        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
-        .attr("width", bar4_target_width)
-        .attr("height", bar_label_height);
-
-      labelBar.append("text")
-        .attr("class", "bar_text")
-        .text("Less than high school")
-        .attr("x", timebar_offset_x + (bar4_target_width / 2) - 70)
-        .attr("y", timebar_offset_y - timebar_label_margin - 6);
-
-       labelBar.append("rect")
-        .attr("class", "bar_label")
-        .attr("id", "daily_lab")     
-        .attr("rx", 4)
-        .attr("ry", 4)
-        .attr("x", timebar_offset_x + bar4_target_width + timebar_margin)
-        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
-        .attr("width", bar4_target_width)
-        .attr("height", bar_label_height); 
-
-      labelBar.append("text")
-        .attr("class", "bar_text")
-        .text("High school")
-        .attr("x", timebar_offset_x + bar4_target_width + timebar_margin + (bar4_target_width / 2) - 50)
-        .attr("y", timebar_offset_y - timebar_label_margin - 6);
-
-    labelBar.append("rect")
-        .attr("class", "bar_label")
-        .attr("id", "multiple_lab")     
-        .attr("rx", 4)
-        .attr("ry", 4)
-        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 2)
-        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
-        .attr("width", bar4_target_width)
-        .attr("height", bar_label_height);
+        restart();
 
 
-      labelBar.append("text")
-        .attr("class", "bar_text")
-        .text("Some college")
-        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 2 + (bar4_target_width / 2) - 55)
-        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+        d3.selectAll(".link").attr("display", "block");     
+        d3.selectAll(".node").attr("opacity", function(d) { if (d.index == 0) { return 1}});
+
+        setTimeout(function() {
+          d3.selectAll(".node").classed("fixed", function(d) { d.fixed = true});
+          d3.selectAll(".link").attr("display", "none");  
+          d3.selectAll(".node").attr("opacity", function(d) { return d.index == 0 ? .4 : 1 });
+        },1000);
+
+        
+        document.getElementById("labelBar1").style.display = "none";
+        document.getElementById("timeBar").style.display = "none";
+        document.getElementById("slide12").style.display = "none";
+        document.getElementById("fourBar").style.display = "block";
+        document.getElementById("slide1200").style.display = "block";
+      var labelBar = d3.select("svg").append("g")
+          .style("display", "block")
+          .attr("id", "labelBar2");
+
+         labelBar.append("rect")
+          .attr("class", "bar_label")
+          .attr("id", "several_lab")     
+          .attr("rx", 4)
+          .attr("ry", 4)
+          .attr("x", timebar_offset_x)
+          .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+          .attr("width", bar4_target_width)
+          .attr("height", bar_label_height);
+
+        labelBar.append("text")
+          .attr("class", "bar_text")
+          .text("Less than high school")
+          .attr("x", timebar_offset_x + (bar4_target_width / 2) - 70)
+          .attr("y", timebar_offset_y - timebar_label_margin - 6);
+
+         labelBar.append("rect")
+          .attr("class", "bar_label")
+          .attr("id", "daily_lab")     
+          .attr("rx", 4)
+          .attr("ry", 4)
+          .attr("x", timebar_offset_x + bar4_target_width + timebar_margin)
+          .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+          .attr("width", bar4_target_width)
+          .attr("height", bar_label_height); 
+
+        labelBar.append("text")
+          .attr("class", "bar_text")
+          .text("High school")
+          .attr("x", timebar_offset_x + bar4_target_width + timebar_margin + (bar4_target_width / 2) - 50)
+          .attr("y", timebar_offset_y - timebar_label_margin - 6);
+
       labelBar.append("rect")
-        .attr("class", "bar_label")
-        .attr("id", "weekly_lab")     
-        .attr("rx", 4)
-        .attr("ry", 4)
-        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 3)
-        .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
-        .attr("width", bar4_target_width)
-        .attr("height", bar_label_height);
-
-      labelBar.append("text")
-        .attr("class", "bar_text")
-        .text("Bachelors degree or higher")
-        .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 3 + (bar4_target_width / 2) - 85)
-        .attr("y", timebar_offset_y - timebar_label_margin - 6);
+          .attr("class", "bar_label")
+          .attr("id", "multiple_lab")     
+          .attr("rx", 4)
+          .attr("ry", 4)
+          .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 2)
+          .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+          .attr("width", bar4_target_width)
+          .attr("height", bar_label_height);
 
 
-      currSlide = 1200;
+        labelBar.append("text")
+          .attr("class", "bar_text")
+          .text("Some college")
+          .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 2 + (bar4_target_width / 2) - 55)
+          .attr("y", timebar_offset_y - timebar_label_margin - 6);
+        labelBar.append("rect")
+          .attr("class", "bar_label")
+          .attr("id", "weekly_lab")     
+          .attr("rx", 4)
+          .attr("ry", 4)
+          .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 3)
+          .attr("y", timebar_offset_y - bar_label_height - timebar_label_margin)
+          .attr("width", bar4_target_width)
+          .attr("height", bar_label_height);
+
+        labelBar.append("text")
+          .attr("class", "bar_text")
+          .text("Bachelors degree or higher")
+          .attr("x", timebar_offset_x + (bar4_target_width + timebar_margin) * 3 + (bar4_target_width / 2) - 85)
+          .attr("y", timebar_offset_y - timebar_label_margin - 6);
+
+
+        currSlide = 1200;
+      }
 
 
     } else if (currSlide == 1200) {
 
-      // Data collection
+
+  var nodeAbove = false;
 
       nodes.forEach(function(n) {
-        if (n.index > 0) { 
-          if (n.x < timebar_offset_x + bar4_target_width && n.y > timebar_offset_y) {
-            n.edu = "less_highschool";
-            console.log("daily: " + n.name);
-          } else if (n.x < timebar_offset_x + bar4_target_width * 2 + timebar_margin && n.y > timebar_offset_y) {
-            n.edu = "highschool";
-            console.log("weekly: " + n.name);
-          } else if (n.x < timebar_offset_x + (bar4_target_width + timebar_margin) * 2 + bar4_target_width && n.y > timebar_offset_y) {
-           n.edu = "some_college";
-            console.log("montly: " + n.name);
-          } else if (n.y > timebar_offset_y) {
-            n.edu = "college_plus"
-            console.log("less_monthly: " + n.name);
-          }
-        }
-      }); 
-      
-
-      document.getElementById("slide13").style.display = "block";
-      document.getElementById("fourBar").style.display = "none";
-      document.getElementById("slide1200").style.display = "none";
-      document.getElementById("labelBar2").style.display = "none";
-    
-
-
-      d3.selectAll(".node").classed("fixed", function(d) { 
-        if (d.index > 0 ) {
-          d.fixed = false
+        if (n.index > 0) {
+          if (n.y < timebar_offset_y) {
+            nodeAbove = true;
+          } 
         }
       });
 
-      restart();
+      console.log("final: " + nodeAbove)
+      if (nodeAbove && !checked) {
+        promptNonresponse();
+        checked = true;
+      } else {
 
+        checked = false;
 
-     // d3.selectAll(".link").attr("display", "block");     
-     // d3.selectAll(".node").attr("opacity", function(d) { if (d.index == 0) { return 1}});
+        // Data collection
+
+        nodes.forEach(function(n) {
+          if (n.index > 0) { 
+            if (n.x < timebar_offset_x + bar4_target_width && n.y > timebar_offset_y) {
+              n.edu = "less_highschool";
+              console.log("daily: " + n.name);
+            } else if (n.x < timebar_offset_x + bar4_target_width * 2 + timebar_margin && n.y > timebar_offset_y) {
+              n.edu = "highschool";
+              console.log("weekly: " + n.name);
+            } else if (n.x < timebar_offset_x + (bar4_target_width + timebar_margin) * 2 + bar4_target_width && n.y > timebar_offset_y) {
+             n.edu = "some_college";
+              console.log("montly: " + n.name);
+            } else if (n.y > timebar_offset_y) {
+              n.edu = "college_plus"
+              console.log("less_monthly: " + n.name);
+            }
+          }
+        }); 
+        
+
+        document.getElementById("slide13").style.display = "block";
+        document.getElementById("fourBar").style.display = "none";
+        document.getElementById("slide1200").style.display = "none";
+        document.getElementById("labelBar2").style.display = "none";
       
 
-      setTimeout(function() {
-        d3.selectAll(".node").classed("fixed", function(d) { d.fixed = true});  
 
-      },1000);
+        d3.selectAll(".node").classed("fixed", function(d) { 
+          if (d.index > 0 ) {
+            d.fixed = false
+          }
+        });
+
+        restart();
 
 
-      currSlide = 13;
+       // d3.selectAll(".link").attr("display", "block");     
+       // d3.selectAll(".node").attr("opacity", function(d) { if (d.index == 0) { return 1}});
+        
+
+        setTimeout(function() {
+          d3.selectAll(".node").classed("fixed", function(d) { d.fixed = true});  
+
+        },1000);
+
+
+        currSlide = 13;
+
+      }
 
     } else if (currSlide == 13) {
 
       document.getElementById("slide13").style.display = "none";
+
+
+      if (nodes[0].race.indexOf("black") !== -1) {
+
+        d3.selectAll(".node").attr("opacity", 1);
+        d3.selectAll(".link").attr("display", "block");
+        d3.selectAll(".node").style("display", "none");
+        d3.selectAll(".link").style("display", "none");
+        d3.selectAll(".node").classed("fixed", function(d) {  
+          if (d.index > 0 ) {
+            d.fixed = false
+          }
+        });
+        restart();
+
+        // If no friends left, skip to slide 20
+        //document.getElementById("slide20").style.display = "block";
+        currSlide += 6;
+        skipped = true;
+        showNext();
+      } else {
+
       document.getElementById("slide14").style.display = "block";
 
       currSlide++;
 
-
+    }
 
 
 
@@ -1908,9 +2008,9 @@ var slide_17 = d3.select("svg").append("g")
         d3.selectAll(".node").classed("fixed", function(d) { d.fixed = true});
         d3.selectAll(".link").attr("display", "none");  
 
-      // Checks to see if there are no friends to ask about or if the respondent is black, in which case skips individual
+      // Checks to see if there are no friends to ask about, in which case skips individual
       // friend questions.
-      if (askedAbout == numFriends || nodes[0].race.indexOf("black") !== -1) {
+      if (askedAbout == numFriends) {
 
 
         d3.selectAll(".node").attr("opacity", 1);
@@ -2002,10 +2102,15 @@ var slide_17 = d3.select("svg").append("g")
         var qText = document.getElementById("question1_text1")
         var qText2 = document.getElementById("question1_text2")
 
+         if ($('input[name=haveBlackFriends]:checked').length == 0 && !checked) {
+
+          promptNonresponse();
+          checked = true;
+
+         } else {
 
           checked = false;
           qText.style.display = "none";
-
 
           if (haveFriends[0].checked) {
 
@@ -2014,22 +2119,17 @@ var slide_17 = d3.select("svg").append("g")
             friendFriends.style.display = "block";
             document.getElementById("question1_text2").style.display = "block";
 
-            checked = false;
-            currSlide += .1;
-          } else if (haveFriends[1].checked) {
 
+
+            currSlide += .1;
+          } else {
             // If no, skip
-            checked = true;
             skipped = true;
             currSlide += .5;
             showNext();
-
-          } else {
-
-            console.log("line 1973")
-            promptNonresponse();
-            checked = true;
           }
+      }
+
 
     } else if (currSlide == 14.6) {
 
@@ -2839,7 +2939,7 @@ var slide_17 = d3.select("svg").append("g")
        // 	showNext();
      //   }
 
-		if (numFriends == 5) {
+		if (numFriends == 5 && nodes[0].race.indexOf("black") == -1) {
         	var qWindow = document.getElementById("question5_window");
       
         	qWindow.style.display = "none";
@@ -2874,7 +2974,7 @@ var slide_17 = d3.select("svg").append("g")
           .attr("x", center - textWidth / 2)
           .attr("y", text_offset_top + 100)
           .text(function() {
-            if (numFriends == 1) { //TOASK: should we account for there being 0 friends?
+            if (numFriends >= 1) { //TOASK: should we account for there being 0 friends?
               return "1) Your social network is smaller than the network of most Americans. 2% of Americans also feel close to only one person. 98% feel close to more people."
             } else if (numFriends == 2) {
               return "1) Your social network is smaller than the network of most Americans. 5% of Americans also feel close to two people. 93% feel close to more people and 2% feel close to only one person."
@@ -3004,7 +3104,7 @@ var slide_17 = d3.select("svg").append("g")
 
 
       // If user has not selected an option, alert with popup
-      if ($('input[name=userEnj]:checked').length == 0 && checked == false) {
+      if ($('input[name=uEnj]:checked').length == 0 && checked == false) {
 
         promptNonresponse();
         checked = true;
@@ -3026,7 +3126,7 @@ var slide_17 = d3.select("svg").append("g")
 
 
       // If user has not selected an option, alert with popup
-      if ($('input[name=userLike]:checked').length == 0 && checked == false) {
+      if ($('input[name=uLike]:checked').length == 0 && checked == false) {
 
         promptNonresponse();
         checked = true;
@@ -3046,7 +3146,7 @@ var slide_17 = d3.select("svg").append("g")
 
     } else if (currSlide == 23) {
       // If user has not selected an option, alert with popup
-      if ($('input[name=userEx]:checked').length == 0 && checked == false) {
+      if ($('input[name=uEx]:checked').length == 0 && checked == false) {
 
         promptNonresponse();
         checked = true;
@@ -3073,9 +3173,19 @@ var slide_17 = d3.select("svg").append("g")
   
 
 
-<div class="example_picture"> 
-  <img src="example_network.png" alt="Example network" id="example_net">
+<div id="example_picture"> 
+  <img src="example_network.png" alt="Example network" id="example_net" position="absolute">
 </div>
+
+<div id="before_pic"> 
+  <img src="Before.png" alt="Example network" id="before_pic" class="pic">
+</div>
+
+<div id="after_pic"> 
+  <img src="After.png" alt="Example network" id="after_pic" class="pic">
+</div>
+
+
 
 <div class="input-group" display="none" id="gender" method="get">
   <form id="userGender" display="none">
@@ -3151,12 +3261,22 @@ First name: <input type="text" name="fname"><br>
   </form>
 </div>
 
+
 <div class="popop_box" id="nonresponse_box">
   <div class="popup_box" id="popup">
         <p class="popup_text">We noticed that you didn't answer this question. It would very helpful for our research if you did. Please feel free to either give an answer or to go to the next question by clicking 'Next' again.</p>
         <button class="btn btn-default" onclick="closePopup()">Close</button>
   </div>
 </div>
+
+
+<div class="popop_box" id="fewFriends_box">
+  <div class="popup_box" id="friendPopup">
+        <p class="popup_text">We noticed that you didn't enter 5 people to your network. Are you sure that there is no additional person you feel close to? If so, please click 'Next' again. Otherwise, please enter the name of the addition person you feel close to.</p>
+        <button class="btn btn-default" onclick="closeFriendPopup()">Close</button>
+  </div>
+</div>
+
 
 <div class="input-group" display="none" id="userEnjoy" method="get">
   <form id="userEnj" display="none">

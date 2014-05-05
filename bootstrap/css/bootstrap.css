@@ -8,15 +8,37 @@
  * Designed and built with all the love in the world by @mdo and @fat.
  */
 
- .example_picture {
-  display: none;
+ #example_picture {
   position: absolute;
-  top: 150px;
-  left: 150px;
+  z-index: 1000;
  }
 
  #example_net {
+  display: none;
+  position: absolute;
+  z-index: 1000;
+ }
 
+#before_pic {
+  position: absolute;
+  top: 100px;
+  left: 40px;
+    z-index: 1000;
+
+}
+
+ #after_pic {
+  position: absolute;
+  top: 400px;
+  left: 40px;
+    z-index: 1000;
+
+ }
+
+ .pic {  
+  display: none;
+  position: absolute;
+  z-index: 1000;
  }
 
 .slideText {
@@ -178,7 +200,34 @@
     background: rgba(0,0,0,0.25);
 }
 
+#fewFriends_box {
+  display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height:100%;
+    width: 100%;
+    cursor: pointer;
+    z-index: 1000; /* high z-index */
+    background: #000; /* fallback */
+    background: rgba(0,0,0,0.25);
+}
+
 #popup {
+  display: none;
+  background: #fff;
+  padding: 1%;
+  width: 40%;
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  margin: 0 0 0 -20%; /* add negative left margin for half the width to center the div */
+  cursor: default;
+  border-radius: 3px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.9);
+}
+
+#friendPopup {
   display: none;
   background: #fff;
   padding: 1%;
