@@ -125,49 +125,43 @@
     slide_1.append("text")
       .attr("class", "slideText")
       .attr("x", center - textWidth / 2)
-      .attr("y", text_offset_top + title_offset_top)
+      .attr("y", text_offset_top + title_offset_top + 10)
       .text("Researchers at Stanford University are conducting a study of Americans' social relationships. You will be asked to answer a few questions about your friends and acquaintances.")
       .call(wrap, textWidth)
     slide_1.append("text")
       .attr("class", "slideText")
       .attr("x", center - textWidth / 2)
-      .attr("y", text_offset_top + title_offset_top + 53)
+      .attr("y", text_offset_top + title_offset_top + 70)
       .text("This questionnaire will take you about 10 minutes.")
       .call(wrap, textWidth)
     slide_1.append("text")
       .attr("class", "slideText")
       .attr("x", center - textWidth / 2)
-      .attr("y", text_offset_top + title_offset_top + 90)
-      .text("We foresee no risk or discomfort associated with this study. There will be no immediate direct benefits to you participating, but we anticipate that results of this work will help us understand how social relationships of Americans look in 2014.")
-      .call(wrap, textWidth)
-    slide_1.append("text")
-      .attr("class", "slideText")
-      .attr("x", center - textWidth / 2)
-      .attr("y", text_offset_top + title_offset_top + 160)
+      .attr("y", text_offset_top + title_offset_top + 130)
       .text("If you have questions about your rights as a study participant, or are dissatisfied at any time with any aspect of this study, you may contact - anonymously, if you wish - the Research Compliance Office, Stanford University, Stanford, CA 94305 (or by phone 1-866-680-2906).")
       .call(wrap, textWidth)
     slide_1.append("text")
       .attr("class", "slideText")
       .attr("x", center - textWidth / 2)
-      .attr("y", text_offset_top + title_offset_top + 230)
+      .attr("y", text_offset_top + title_offset_top + 220)
       .text("FOR QUESTIONS ABOUT THE STUDY, CONTACT:")
       .call(wrap, textWidth)
     slide_1.append("text")
       .attr("class", "slideText")
       .attr("x", center - textWidth / 2)
-      .attr("y", text_offset_top + title_offset_top + 250)
+      .attr("y", text_offset_top + title_offset_top + 240)
       .text("Tobias Stark")
       .call(wrap, textWidth)
     slide_1.append("text")
       .attr("class", "slideText")
       .attr("x", center - textWidth / 2)
-      .attr("y", text_offset_top + title_offset_top + 270)
+      .attr("y", text_offset_top + title_offset_top + 260)
       .text("Stanford University, 432 McClatchy Hall, 450 Serra Mall, Stanford, CA, 94305")
       .call(wrap, textWidth)
     slide_1.append("text")
       .attr("class", "slideText")
       .attr("x", center - textWidth / 2)
-      .attr("y", text_offset_top + title_offset_top + 290)
+      .attr("y", text_offset_top + title_offset_top + 280)
       .text("E-mail: TStark@Stanford.edu")
       .call(wrap, textWidth)
 
@@ -308,6 +302,35 @@
           .text("We added a color for the men in your network. Please click 'Next' when everything is correct. If you want to change the sex of a person, simply click on the name.") 
         .call(wrap, textWidth)
 
+    var mf_legend = slide_6.append("g")
+      mf_legend.append("rect")
+        .attr("id", "mf_box")
+        .attr("x", center + textWidth / 2 - 200)
+        .attr("y", 150)
+        .attr("width", 100)
+        .attr("height", 70)
+      mf_legend.append("rect")
+        .attr("x", center + textWidth / 2 - 200 + 10)
+        .attr("y", 160)
+        .attr("width", 20)
+        .attr("height", 20)
+        .style("fill", maleColor);
+      mf_legend.append("rect")
+        .attr("x", center + textWidth / 2 - 200 + 10)
+        .attr("y", 190)
+        .attr("width", 20)
+        .attr("height", 20)
+        .style("fill", femaleColor);
+      mf_legend.append("text")
+        .attr("class", "questionText")
+        .attr("x", center + textWidth / 2 - 200 + 35)
+        .attr("y", 175)
+        .text("Male")
+      mf_legend.append("text")
+        .attr("class", "questionText")
+        .attr("x", center + textWidth / 2 - 200 + 35)
+        .attr("y", 205)
+        .text("Female")
 
 
       var slide_7 = d3.select("svg").append("g")
@@ -852,22 +875,28 @@ var slide_17 = d3.select("svg").append("g")
       d3.select("slide_2").append("first_friend_text");
     }
 
-    numFriends++;
 
     var friendName = document.getElementById("friendNameID");
 
-    if (numFriends <= 5) {
-      var node = {name: friendName.value, id: numFriends, gender:"", race:"", edu:null, freq:null},
-          n = nodes.push(node);
-      
-      links.push({source: node, target: 0});
+    if (friendName.value.length > 0) {
+
+
+      numFriends++;
+
+      if (numFriends <= 5) {
+        var node = {name: friendName.value, id: numFriends, gender:"", race:"", edu:null, freq:null},
+            n = nodes.push(node);
+        
+        links.push({source: node, target: 0});
 
 
 
-      restart();
+        restart();
+      }
+
+      document.getElementById("friendNameID").value = '';
+
     }
-
-    document.getElementById("friendNameID").value = '' //TODO: this does noytyyyyytttt work
   }
 
 
@@ -1183,6 +1212,11 @@ var slide_17 = d3.select("svg").append("g")
     document.getElementById("friendPopup").style.display = "block";
   }
 
+  function dragPromptNonresponse() {
+    document.getElementById("fewDragged_box").style.display = "block";
+    document.getElementById("dragPopup").style.display = "block";
+  }
+
 
   function closePopup() {
 
@@ -1194,6 +1228,12 @@ var slide_17 = d3.select("svg").append("g")
 
     document.getElementById("fewFriends_box").style.display = "none";
     document.getElementById("friendPopup").style.display = "none";
+  }
+
+  function closeDragPopup() {
+
+    document.getElementById("fewDragged_box").style.display = "none";
+    document.getElementById("dragPopup").style.display = "none";
   }
 
 
@@ -1420,13 +1460,13 @@ var slide_17 = d3.select("svg").append("g")
 
           var l = center - 330;
           var le = l.toString();
-          var pic = document.getElementById("example_net");
+        //  var pic = document.getElementById("example_net");
 
-          pic.style.left = le + "px";
-          pic.style.top = "60px";
-          pic.style.position = "absolute";
+         // pic.style.left = le + "px";
+         // pic.style.top = "60px";
+         // pic.style.position = "absolute";
 
-          pic.style.display = "block";
+         // pic.style.display = "block";
 
 
           currSlide += 2;
@@ -1491,12 +1531,12 @@ var slide_17 = d3.select("svg").append("g")
 
           var l = center - 330;
           var le = l.toString();
-          var pic = document.getElementById("example_net");
+         // var pic = document.getElementById("example_net");
 
-          pic.style.left = le + "px";
-          pic.style.top = "60px";
+        //  pic.style.left = le + "px";
+         // pic.style.top = "60px";
 
-          pic.style.display = "block";
+          //pic.style.display = "block";
       }
 
 
@@ -1517,7 +1557,7 @@ var slide_17 = d3.select("svg").append("g")
       document.getElementById("slide2").style.display = "none";
       document.getElementById("slide3").style.display = "block";
       document.getElementById("name_input").style.display = "block";
-      document.getElementById("example_net").style.display = "none";
+     //  document.getElementById("example_net").style.display = "none";
       currSlide = 3;
 
 
@@ -1772,7 +1812,7 @@ var slide_17 = d3.select("svg").append("g")
 
       console.log("final: " + nodeAbove)
       if (nodeAbove && !checked) {
-        promptNonresponse();
+        dragPromptNonresponse();
         checked = true;
       } else {
 
@@ -1910,7 +1950,7 @@ var slide_17 = d3.select("svg").append("g")
 
       console.log("final: " + nodeAbove)
       if (nodeAbove && !checked) {
-        promptNonresponse();
+        dragPromptNonresponse();
         checked = true;
       } else {
 
@@ -3274,6 +3314,13 @@ First name: <input type="text" name="fname"><br>
   <div class="popup_box" id="friendPopup">
         <p class="popup_text">We noticed that you didn't enter 5 people to your network. Are you sure that there is no additional person you feel close to? If so, please click 'Next' again. Otherwise, please enter the name of the addition person you feel close to.</p>
         <button class="btn btn-default" onclick="closeFriendPopup()">Close</button>
+  </div>
+</div>
+
+<div class="popop_box" id="fewDragged_box">
+  <div class="popup_box" id="dragPopup">
+        <p class="popup_text">We noticed you didn't answer this question for all people in you network. Are you sure that there is no additional person you feel close to? If so, please click 'Next' again. Otherwise, please enter the name of the addition person you feel close to.</p>
+        <button class="btn btn-default" onclick="closeDragPopup()">Close</button>
   </div>
 </div>
 
