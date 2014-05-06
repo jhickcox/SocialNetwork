@@ -3014,7 +3014,7 @@ var slide_17 = d3.select("svg").append("g")
           .attr("x", center - textWidth / 2)
           .attr("y", text_offset_top + 100)
           .text(function() {
-            if (numFriends >= 1) { //TOASK: should we account for there being 0 friends?
+            if (numFriends <= 1) { //TOASK: should we account for there being 0 friends?
               return "1) Your social network is smaller than the network of most Americans. 2% of Americans also feel close to only one person. 98% feel close to more people."
             } else if (numFriends == 2) {
               return "1) Your social network is smaller than the network of most Americans. 5% of Americans also feel close to two people. 93% feel close to more people and 2% feel close to only one person."
@@ -3319,7 +3319,7 @@ First name: <input type="text" name="fname"><br>
 
 <div class="popop_box" id="fewDragged_box">
   <div class="popup_box" id="dragPopup">
-        <p class="popup_text">We noticed you didn't answer this question for all people in you network. Are you sure that there is no additional person you feel close to? If so, please click 'Next' again. Otherwise, please enter the name of the addition person you feel close to.</p>
+        <p class="popup_text">We noticed that you didn't answer this question for all persons in your network. It would very helpful for our research if you did. Please feel free to either give an answer or to go to the next question by clicking 'Next' again</p>
         <button class="btn btn-default" onclick="closeDragPopup()">Close</button>
   </div>
 </div>
