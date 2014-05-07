@@ -131,8 +131,8 @@
     slide_1.append("text")
       .attr("class", "slideText")
       .attr("x", center - textWidth / 2)
-      .attr("y", text_offset_top + title_offset_top + 70)
-      .text("This questionnaire will take you about 10 minutes.")
+      .attr("y", text_offset_top + title_offset_top + 77)
+      .text("This questionnaire will take you less than 10 minutes.")
       .call(wrap, textWidth)
     slide_1.append("text")
       .attr("class", "slideText")
@@ -177,10 +177,10 @@
       .attr("width", bodyWidth)
       .attr("height", bodyHeight)
     slide_105.append("text")
-        .attr("class", "slideText")
-        .attr("x", center - (textWidth / 2))
-        .attr("y", text_offset_top)
-        .text("In the next step, you will be asked information about people outside of your home that you feel closest to. These may be friends, co-workers, neighbors, or relatives. Together, these people make up your social network.") //TODO: make part of text (people-to) bold
+      .attr("class", "slideText")
+      .attr("x", center - (textWidth / 2))
+      .attr("y", text_offset_top)
+      .text("In the next step, you will be asked information about people outside of your home that you feel closest to. These may be friends, co-workers, neighbors, or relatives. Together, these people make up your social network.") //TODO: make part of text (people-to) bold
       .call(wrap, textWidth)
 
 	var randomnumber = Math.floor(Math.random() * 11) // TODO: double check that this is really 50/50 chance
@@ -194,7 +194,7 @@
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top + 50)
         .text("At the end of the questionnaire, you will receive a report that tells you how similar your social network is compared to the average American.")
-      .call(wrap, textWidth)
+        .call(wrap, textWidth)
     }
 
 
@@ -215,7 +215,7 @@
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top)
         .text("Who are the people outside of you home that your feel closest to? These may be friends, co-workers, neighbors, relatives, or anyone else who does not live with you. You can enter up to five people.")
-      .call(wrap, textWidth)
+        .call(wrap, textWidth)
     slide_2.append("text")
       .attr("class", "slideText")
       .attr("id", "first_friend_text")
@@ -240,13 +240,13 @@
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top)
         .text("Who are the people outside of your home that you feel closest to? These may be friends, co-workers, neighbors, relatives, or anyone else who does not live with you. You can enter up to five people.")
-      .call(wrap, textWidth)
+        .call(wrap, textWidth)
     slide_3.append("text")
         .attr("class", "slideText")
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top + 60)
         .text("Please type the first name of a person you feel closest to. Then click 'enter.'")
-      .call(wrap, textWidth)
+        .call(wrap, textWidth)
 
 
     var slide_4 = d3.select("svg").append("g")
@@ -264,7 +264,7 @@
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top)
         .text("This is a picture of your social network. We will next ask a couple of questions about the persons in your network.")
-      .call(wrap, textWidth)
+        .call(wrap, textWidth)
 
 
     var slide_5 = d3.select("svg").append("g")
@@ -282,7 +282,7 @@
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top)
         .text("Which of these people are WOMEN? Please click on the names of the WOMEN in your network. Click 'Next' when you are done or if there are no WOMEN among your friends.")
-      .call(wrap, textWidth)
+        .call(wrap, textWidth)
 
 
     var slide_6 = d3.select("svg").append("g")
@@ -300,7 +300,7 @@
           .attr("x", center - (textWidth / 2))
           .attr("y", text_offset_top)
           .text("We added a color for the men in your network. Please click 'Next' when everything is correct. If you want to change the sex of a person, simply click on the name.") 
-        .call(wrap, textWidth)
+          .call(wrap, textWidth)
 
     var mf_legend = slide_6.append("g")
       mf_legend.append("rect")
@@ -348,7 +348,7 @@
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top)
         .text("Which of these people are WHITE? Please click on the names of the WHITE (Caucasian) people in your social network. Click 'Next' when you are done or if no one is WHITE.")
-      .call(wrap, textWidth)
+        .call(wrap, textWidth)
 
 
 
@@ -367,7 +367,7 @@
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top)
         .text("Which of these people are ASIAN? Please click on the names of the ASIAN people in your social network (including mixed-race Asians). Click 'Next' when you are done or if no one is ASIAN.")
-      .call(wrap, textWidth)
+        .call(wrap, textWidth)
 
 
   var slide_9 = d3.select("svg").append("g")
@@ -385,7 +385,7 @@
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top)
         .text("Which of these people are BLACK? Please click on the names of the BLACK people in your social network (including mixed-race Blacks). Click 'Next' when you are done or if no one is BLACK.")
-      .call(wrap, textWidth)
+        .call(wrap, textWidth)
 
 
 
@@ -404,7 +404,7 @@
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top)
         .text("Which of these people are HISPANIC? Please click on the names of the HISPANIC people in your social network (including mixed-race Hispanics). Click 'Next' when you are done or if no one is HISPANIC.")
-      .call(wrap, textWidth)
+        .call(wrap, textWidth)
 
 
     var slide_11 = d3.select("svg").append("g")
@@ -422,7 +422,7 @@
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top)
         .text("Which of these people are 'OTHER' race? Please click on the names of the people of OTHER races in your social network. Click 'Next' when you are done or if no one is of OTHER races.")
-      .call(wrap, textWidth)  
+        .call(wrap, textWidth)  
 
 
     var slide_12 = d3.select("svg").append("g")
@@ -440,7 +440,7 @@
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top)
         .text("How often do you talk to each person in your network? Drag the circles with the names of each person into the box below that indicates how often you talk to each other.")
-      .call(wrap, textWidth) 
+        .call(wrap, textWidth) 
 
     var slide_1200 = d3.select("svg").append("g")
       .attr("id", "slide1200")
@@ -457,7 +457,7 @@
       .attr("x", center - (textWidth / 2))
       .attr("y", text_offset_top)
       .text("As far as you know, what is the highest level of education of each person? Please offer your best guess if you are not certain.")
-    .call(wrap, textWidth) 
+      .call(wrap, textWidth) 
 
 
     var slide_13 = d3.select("svg").append("g")
@@ -952,7 +952,7 @@ var slide_17 = d3.select("svg").append("g")
           lineHeight = 1.1, // ems
           y = text.attr("y"),
           x = text.attr("x")
-         // dy = parseFloat(text.attr("dy")),
+          dy = parseFloat(text.attr("dy")),
           tspan = text.text(null).append("tspan").attr("x", x).attr("y", y);
       while (word = words.pop()) {
         line.push(word);
@@ -3104,6 +3104,15 @@ var slide_17 = d3.select("svg").append("g")
           })
           .call(wrap, textWidth);
 
+
+        var instruction = d3.select("svg").append("text")
+          .attr("class", "slideText")
+          .attr("id", "stat_instruction")
+          .attr("x", center - textWidth / 2)
+          .attr("y", text_offset_top + 370)
+          .text("Please click 'Next' to continue the survey.");
+
+
         var note = d3.select("svg").append("text")
           .attr("class", "questionText")
           .attr("id", "statistics_note")
@@ -3263,7 +3272,7 @@ var slide_17 = d3.select("svg").append("g")
 <div class="input-group" display="none" id="race" method="get">
   <form id="userRace">
     <span class="slideText">What is your race? (One or more categories may be selected)</span><br><br>
-    <input type="checkbox" class="slideText" name="uRace" value="white"><span class="questionText"> White</span><br>
+    <input type="checkbox" class="slideText" name="uRace" value="white"><span class="questionText"> White (Caucasian)</span><br>
     <input type="checkbox" name="uRace" value="black"><span class="questionText"> Black </span><br>
     <input type="checkbox" name="uRace" value="native"><span class="questionText"> American Indian, Alaska Native or Native Hawaiian </span><br>
     <input type="checkbox" name="uRace" value="asian"><span class="questionText"> Asian </span><br>
@@ -3343,7 +3352,7 @@ First name: <input type="text" name="fname"><br>
     <input type="radio" name="uLike" value="very_likely"><span class="questionText">  Very likely</span><br>
     <input type="radio" name="uLike" value="moderately_likely"><span class="questionText">  Moderately likely </span><br>
     <input type="radio" name="uLike" value="a_little_likely"><span class="questionText">  A little likely </span><br>
-    <input type="radio" name="uLike" value="not_very_likely"><span class="questionText">  Not very likely</span>
+    <input type="radio" name="uLike" value="not_very_likely"><span class="questionText">  Not at all likely</span>
   </form>
 </div>
 
