@@ -3613,7 +3613,7 @@ First name: <input type="text" name="fname"><br>
   $f = fopen("data/data.txt", "a");
 
   // Write text line
-  fwrite($f, linkText); 
+  fwrite($f, "hello\n"); 
 
 
   // Close the text file
@@ -3621,6 +3621,16 @@ First name: <input type="text" name="fname"><br>
   fclose($f);
 
   ?>
+
+<!--  <?php
+$file = 'data/data.txt';
+// Open the file to get existing content
+$current = file_get_contents($file);
+// Append a new person to the file
+$current .= "John Smith\n";
+// Write the contents back to the file
+file_put_contents($file, $current);
+?>-->
 
 
   </body>
