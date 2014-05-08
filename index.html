@@ -70,7 +70,7 @@
 
     var curr_friend_x = 200,
         curr_friend_y = 200,
-        q_window_width = 100,
+        q_window_width = 150,
         q_window_height = 100;
 
     var nodeColor = '#9CD4D4',
@@ -85,6 +85,8 @@
     var startTime,
       endTime;
 
+    var results = [];
+
 
 
     $('.nav-tabs').button()
@@ -96,7 +98,24 @@
 
   var force = d3.layout.force()
     .size([bodyWidth, bodyHeight])
-    .nodes([{x:bodyWidth / 2, y:bodyHeight / 2 + 55, fixed: true, name:"You", id:0, gender:"", race:"", edu:null, freq:null}]) // initialize with a single node
+    .nodes([{x:bodyWidth / 2, 
+              y:bodyHeight / 2 + 55, 
+              fixed: true, 
+              name:"You", 
+              id:0, 
+              gender:"", 
+              age:0,
+              race:"", 
+              surveyTime:0,
+              sawStats:false,
+              edu:null, 
+              freq:null, 
+              haveBlackFriends:"",
+              friendsBlackFriends:"",
+              knowBlackFriends:"",
+              enjoy:"",
+              like:"",
+              exhaust:""}]) // initialize with a single node
     .linkDistance(100)
     .charge(-1500)
     .on("tick", tick);
@@ -105,6 +124,17 @@
       links = force.links(),
       node = svg.selectAll(".node"),
       link = svg.selectAll(".link");
+
+  var fileArray = [];
+  var linkText = 'hello';
+
+
+  // for use when pushed to afs space
+//d3.text("/afs/ir.stanford.edu/users/j/h/jhickcox/WWW/SurveyData/data.csv", function(text) {
+d3.text("/data/data.txt", function(text) {
+  fileArray = d3.csv.parseRows(text);
+});
+
 
 
 // Slide 1
@@ -180,7 +210,7 @@
       .attr("class", "slideText")
       .attr("x", center - (textWidth / 2))
       .attr("y", text_offset_top)
-      .text("In the next step, you will be asked information about people outside of your home that you feel closest to. These may be friends, co-workers, neighbors, or relatives. Together, these people make up your social network.") //TODO: make part of text (people-to) bold
+      .text("In the next section, you will be asked questions about people outside of your home to whom you feel closest. These may be friends, co-workers, neighbors, or relatives. Together, these people make up your social network.")
       .call(wrap, textWidth)
 
 	var randomnumber = Math.floor(Math.random() * 11) // TODO: double check that this is really 50/50 chance
@@ -189,6 +219,7 @@
 
     // If random number is even, show additional message about statistics
     if (randomnumber % 2 == 0) {
+      nodes[0].sawStats = true;
       slide_105.append("text")
         .attr("class", "slideText")
         .attr("x", center - (textWidth / 2))
@@ -216,12 +247,7 @@
         .attr("y", text_offset_top)
         .text("Who are the people outside of you home that your feel closest to? These may be friends, co-workers, neighbors, relatives, or anyone else who does not live with you. You can enter up to five people.")
         .call(wrap, textWidth)
-    slide_2.append("text")
-      .attr("class", "slideText")
-      .attr("id", "first_friend_text")
-      .attr("x", center - (textWidth / 2))
-      .attr("y", text_offset_top + 160)
-      .text("Please type the first name of a person you feel closest to. Then click 'Enter.'")
+    
 
   
 
@@ -243,10 +269,20 @@
         .call(wrap, textWidth)
     slide_3.append("text")
         .attr("class", "slideText")
+        .attr("id", "first_friend_text")
         .attr("x", center - (textWidth / 2))
         .attr("y", text_offset_top + 60)
         .text("Please type the first name of a person you feel closest to. Then click 'enter.'")
         .call(wrap, textWidth)
+    slide_3.append("text")
+      .attr("class", "slideText")
+      .attr("id", "second_friend_text")
+      .attr("display", "none")
+      .attr("x", center - (textWidth / 2))
+      .attr("y", text_offset_top + 60)
+      .style("stroke", "none")
+      .style("fill", "red")
+      .text("Is there another person you feel close to? Please type this person's first name. Then click 'Enter.'")
 
 
     var slide_4 = d3.select("svg").append("g")
@@ -864,29 +900,51 @@ var slide_17 = d3.select("svg").append("g")
   function addFriend() {
   	
 
-    if (numFriends == 0) {
-      //var txt = document.getElementById("first_friend_text")
-      //txt.style.display = "none";
-      //txt.text = "Is there another person to whom you feel close? Please enter their first name."
-      //txt.style.display = "block";
-      //document.getElementById("slide2").append(txt)
-
-      d3.selectAll("slide_2").select("first_friend_text").text = "Is there another person to whom you feel close? Please enter their first name."
-      d3.select("slide_2").append("first_friend_text");
-    }
-
 
     var friendName = document.getElementById("friendNameID");
 
     if (friendName.value.length > 0) {
 
 
+
+       if (numFriends == 0) {
+      //var txt = document.getElementById("first_friend_text")
+      //txt.style.display = "none";
+      //txt.text = "Is there another person to whom you feel close? Please enter their first name."
+      //txt.style.display = "block";
+      //document.getElementById("slide2").append(txt)
+
+      //d3.selectAll("slide_2").select("first_friend_text").text = "Is there another person to whom you feel close? Please enter their first name."
+      //d3.select("slide_2").append("first_friend_text");
+
+      document.getElementById("first_friend_text").style.display = "none";
+      document.getElementById("second_friend_text").style.display = "block";
+     // d3.select("firstFriend").attr("display", "none");
+    }
+
+
       numFriends++;
 
       if (numFriends <= 5) {
-        var node = {name: friendName.value, id: numFriends, gender:"", race:"", edu:null, freq:null},
+        var node = {name: friendName.value, 
+                      id: numFriends, 
+                      gender:"", 
+                      age:0,
+                      race:"", 
+                      surveyTime:0,
+                      sawStats:false,
+                      edu:null, 
+                      freq:null, 
+                      haveBlackFriends:"",
+                      friendsBlackFriends:"",
+                      knowBlackFriends:"",
+                      enjoy:"",
+                      like:"",
+                      exhaust:""}
             n = nodes.push(node);
         
+
+
         links.push({source: node, target: 0});
 
 
@@ -984,7 +1042,7 @@ var slide_17 = d3.select("svg").append("g")
 
 
 
-  //TODO: use to gather data from previous friend, if possible
+
   function refreshRadio() {
 
       var text1 = "question" + askedAbout + "_text1";
@@ -1358,16 +1416,19 @@ var slide_17 = d3.select("svg").append("g")
 
     } else if (currSlide == 102) {
 
+
+      var age = document.getElementById("userAge").value;
+
       //TODO: check that age has been entered, and that it is within a certain range
       // If user has not selected an option, alert with popup
-     // if ($('input[name=age]:checked').length == 0 && checked == false) {
+      if ( !(age >= 1990 && age <= 1997) && checked == false) {
 
-   //     promptNonresponse();
-    //    checked = true;
+        promptNonresponse();
+        checked = true;
 
-     // } else {
+      } else {
 
-
+        nodes[0].age = age;
 
 
         // Ask about respondent's education
@@ -1380,7 +1441,7 @@ var slide_17 = d3.select("svg").append("g")
 
         currSlide += 1;
         checked = false;
-    //  }
+      }
 
 
 
@@ -2158,11 +2219,13 @@ var slide_17 = d3.select("svg").append("g")
             haveFriends.style.display = "none";
             friendFriends.style.display = "block";
             document.getElementById("question1_text2").style.display = "block";
+            nodes[askedAbout].haveBlackFriends = "true";
 
 
 
             currSlide += .1;
           } else {
+            nodes[askedAbout].haveBlackFriends = "false";
             // If no, skip
             skipped = true;
             currSlide += .5;
@@ -2185,7 +2248,7 @@ var slide_17 = d3.select("svg").append("g")
 
         // If respondent is close to all friends, skip third question
 
-        
+        nodes[askedAbout].friendsBlackFriends = "all";
         currSlide += .4;
         checked = false;
         skipped = true;
@@ -2199,6 +2262,12 @@ var slide_17 = d3.select("svg").append("g")
           checked = true;
 
          } else {
+
+          if (friendFriends[0].checked) {
+            nodes[askedAbout].friendsBlackFriends = "some";
+          } else if (friendsFriends[2].checked) {
+            nodes[askedAbout].friendsBlackFriends = "none";
+          }
 
         qText.style.display = "none";
 
@@ -2229,6 +2298,15 @@ var slide_17 = d3.select("svg").append("g")
           checked = true;
 
          } else {
+
+          // Record data
+          if (knowFriends[0].checked) {
+            nodes[askedAbout].knowBlackFriends = "some";
+          } else if (knowFriends[1].checked) {
+            nodes[askedAbout.knowBlackFriends] = "all";
+          } else if (knowFriends[2].checked) {
+            nodes[askedAbout].knowBlackFriends = "none";
+          }
 
           checked = false;
           skipped = false;
@@ -2350,12 +2428,13 @@ var slide_17 = d3.select("svg").append("g")
             haveFriends.style.display = "none";
             friendFriends.style.display = "block";
             document.getElementById("question2_text2").style.display = "block";
-
+            nodes[askedAbout].haveBlackFriends = "true";
 
 
             currSlide += .1;
           } else {
             // If no, skip
+            nodes[askedAbout].haveBlackFriends = "false";
             skipped = true;
             currSlide += .5;
             showNext();
@@ -2374,6 +2453,8 @@ var slide_17 = d3.select("svg").append("g")
 
       if (friendFriends[1].checked) {
 
+        nodes[askedAbout].friendsBlackFriends = "all";
+
         // If respondent is close to all friends, skip third question
         qText.style.display = "none";
         skipped = true;
@@ -2390,6 +2471,11 @@ var slide_17 = d3.select("svg").append("g")
 
          } else {
 
+          if (friendFriends[0].checked) {
+            nodes[askedAbout].friendsBlackFriends = "some";
+          } else if (friendsFriends[2].checked) {
+            nodes[askedAbout].friendsBlackFriends = "none";
+          }
 
             qText.style.display = "none";
             checked = false;
@@ -2417,6 +2503,16 @@ var slide_17 = d3.select("svg").append("g")
           checked = true;
 
          } else {
+
+          // Record data
+          if (knowFriends[0].checked) {
+            nodes[askedAbout].knowBlackFriends = "some";
+          } else if (knowFriends[1].checked) {
+            nodes[askedAbout.knowBlackFriends] = "all";
+          } else if (knowFriends[2].checked) {
+            nodes[askedAbout].knowBlackFriends = "none";
+          }
+
           skipped = false;
           checked = false;
 
@@ -2536,13 +2632,14 @@ var slide_17 = d3.select("svg").append("g")
             haveFriends.style.display = "none";
             friendFriends.style.display = "block";
             document.getElementById("question3_text2").style.display = "block";
-
+            nodes[askedAbout].haveBlackFriends = "true";
 
 
             currSlide += .1;
           } else {
             // If no, skip
             skipped = true;
+            nodes[askedAbout].haveBlackFriends = "false";
             currSlide += .5;
             showNext();
           }
@@ -2561,6 +2658,8 @@ var slide_17 = d3.select("svg").append("g")
 
       if (friendFriends[1].checked) {
 
+        nodes[askedAbout].friendsBlackFriends = "all"
+
         // If respondent is close to all friends, skip third question
         qText.style.display = "none";
         skipped = true;
@@ -2575,6 +2674,14 @@ var slide_17 = d3.select("svg").append("g")
           checked = true;
 
          } else {
+
+
+          // Record data
+          if (friendFriends[0].checked) {
+            nodes[askedAbout].friendsBlackFriends = "some";
+          } else if (friendsFriends[2].checked) {
+            nodes[askedAbout].friendsBlackFriends = "none";
+          }
 
               qText.style.display = "none";
               checked = false;
@@ -2603,6 +2710,16 @@ var slide_17 = d3.select("svg").append("g")
           checked = true;
 
          } else {
+
+          // Record data
+          if (knowFriends[0].checked) {
+            nodes[askedAbout].knowBlackFriends = "some";
+          } else if (knowFriends[1].checked) {
+            nodes[askedAbout.knowBlackFriends] = "all";
+          } else if (knowFriends[2].checked) {
+            nodes[askedAbout].knowBlackFriends = "none";
+          }
+
           checked = false;
           skipped = false;
 
@@ -2719,13 +2836,14 @@ var slide_17 = d3.select("svg").append("g")
             haveFriends.style.display = "none";
             friendFriends.style.display = "block";
             document.getElementById("question4_text2").style.display = "block";
-
+            nodes[askedAbout].haveBlackFriends = "true";
 
 
             currSlide += .1;
           } else {
             // If no, skip
             skipped = true;
+            nodes[askedAbout].haveBlackFriends = "false";
             currSlide += .5;
             showNext();
           }
@@ -2744,6 +2862,8 @@ var slide_17 = d3.select("svg").append("g")
 
       if (friendFriends[1].checked) {
 
+        nodes[askedAbout].friendsBlackFriends = "all";
+
         // If respondent is close to all friends, skip third question
         qText.style.display = "none";
         skipped = true;
@@ -2758,6 +2878,12 @@ var slide_17 = d3.select("svg").append("g")
           checked = true;
 
          } else {
+
+          if (friendFriends[0].checked) {
+            nodes[askedAbout].friendsBlackFriends = "some";
+          } else if (friendsFriends[2].checked) {
+            nodes[askedAbout].friendsBlackFriends = "none";
+          }
 
             qText.style.display = "none";
             checked = false;
@@ -2787,6 +2913,16 @@ var slide_17 = d3.select("svg").append("g")
           checked = true;
 
          } else {
+
+          // Record data
+          if (knowFriends[0].checked) {
+            nodes[askedAbout].knowBlackFriends = "some";
+          } else if (knowFriends[1].checked) {
+            nodes[askedAbout.knowBlackFriends] = "all";
+          } else if (knowFriends[2].checked) {
+            nodes[askedAbout].knowBlackFriends = "none";
+          }
+
           skipped = false;
           checked = false;
 
@@ -2901,13 +3037,14 @@ var slide_17 = d3.select("svg").append("g")
             haveFriends.style.display = "none";
             friendFriends.style.display = "block";
             document.getElementById("question5_text2").style.display = "block";
-
+            nodes[askedAbout].haveBlackFriends = "true";
 
 
             currSlide += .1;
           } else {
             // If no, skip
             skipped = true;
+            nodes[askedAbout].haveBlackFriends = "false";
             currSlide += .5;
             showNext();
           }
@@ -2926,6 +3063,8 @@ var slide_17 = d3.select("svg").append("g")
 
       if (friendFriends[1].checked) {
 
+        nodes[askedAbout].friendsBlackFriends = "all";
+
         // If respondent is close to all friends, skip third question
         qText.style.display = "none";
         skipped = true;
@@ -2940,6 +3079,13 @@ var slide_17 = d3.select("svg").append("g")
           checked = true;
 
          } else {
+
+
+          if (friendFriends[0].checked) {
+            nodes[askedAbout].friendsBlackFriends = "some";
+          } else if (friendsFriends[2].checked) {
+            nodes[askedAbout].friendsBlackFriends = "none";
+          }
 
             qText.style.display = "none";
             checked = false;
@@ -2969,6 +3115,8 @@ var slide_17 = d3.select("svg").append("g")
           checked = true;
 
          } else {
+
+
           skipped = false;
           checked = false;
 
@@ -2980,6 +3128,17 @@ var slide_17 = d3.select("svg").append("g")
      //   }
 
 		if (numFriends == 5 && nodes[0].race.indexOf("black") == -1) {
+
+
+          // Record data
+          if (knowFriends[0].checked) {
+            nodes[askedAbout].knowBlackFriends = "some";
+          } else if (knowFriends[1].checked) {
+            nodes[askedAbout.knowBlackFriends] = "all";
+          } else if (knowFriends[2].checked) {
+            nodes[askedAbout].knowBlackFriends = "none";
+          }
+
         	var qWindow = document.getElementById("question5_window");
       
         	qWindow.style.display = "none";
@@ -3136,6 +3295,7 @@ var slide_17 = d3.select("svg").append("g")
     		document.getElementById("size_statistic").style.display = "none";
     		document.getElementById("density_statistic").style.display = "none";
     		document.getElementById("race_statistic").style.display = "none";
+        document.getElementById("stat_instruction").style.display = "none";
         document.getElementById("statistics_note").style.display = "none";
     	}
 
@@ -3160,9 +3320,23 @@ var slide_17 = d3.select("svg").append("g")
 
 
       } else {
-        //TODO: collect data before going on
+
+        //Collect data before going on
+        var enj = document.getElementById("userEnj")
+        if (enj[0].checked) {
+          nodes[0].enjoy = "great_deal";
+        } else if (enj[1].checked) {
+          nodes[0].enjoy = "a_lot";
+        } else if (enj[2].checked) {
+          nodes[0].enjoy = "moderately";
+        } else if (enj[3].checked) {
+          nodes[0].enjoy = "a_little";
+        } else if (enj[4].checked) {
+          nodes[0].enjoy = "not_at_all";
+        }
+
         checked = false;
-        document.getElementById("userEnjoy").style.display = "none";
+        enj.style.display = "none";
 
         var like = document.getElementById("userLikelihood");
         like.style.left = string_l + "px";
@@ -3182,6 +3356,20 @@ var slide_17 = d3.select("svg").append("g")
 
 
       } else {
+
+        //Collect data before going on
+        var like = document.getElementById("userLike")
+        if (like[0].checked) {
+          nodes[0].like = "extremely";
+        } else if (like[1].checked) {
+          nodes[0].like = "very";
+        } else if (like[2].checked) {
+          nodes[0].like = "moderately";
+        } else if (like[3].checked) {
+          nodes[0].like = "a_little";
+        } else if (like[4].checked) {
+          nodes[0].like = "not_at_all";
+        }       
         //TODO: collect data before going on
         checked = false;
         document.getElementById("userLikelihood").style.display = "none";
@@ -3202,12 +3390,52 @@ var slide_17 = d3.select("svg").append("g")
 
 
       } else {
+
+        //Collect data before going on
+        var ex = document.getElementById("userEx")
+        if (ex[0].checked) {
+          nodes[0].exhaust = "extremely";
+        } else if (ex[1].checked) {
+          nodes[0].exhaust = "very";
+        } else if (ex[2].checked) {
+          nodes[0].exhaust = "moderately";
+        } else if (ex[3].checked) {
+          nodes[0].exhaust = "a_little";
+        } else if (ex[4].checked) {
+          nodes[0].exhaust = "not_at_all";
+        }  
+
         checked = false;
         document.getElementById("userExhaust").style.display = "none";
         document.getElementById("slide24").style.display = "block";
         // TODO: collect / record the total time taken
         var d = new Date();
         endTime = d.getTime();
+        var totalTime = (endTime - startTime) / 1000;
+        nodes[0].surveyTime = totalTime;
+
+        //results.push(nodes);
+        results = nodes;
+        console.log(results);
+        fileArray.push(results);
+        console.log(fileArray);
+        //nodes.forEach(function(n) {
+        //  fileArray.push(n);
+        //})
+        
+
+        //var text = d3.csv.formatRows(nodes);
+       // fileArray = d3.csv.formatRows(nodes);
+       var nodeText = JSON.stringify(nodes)
+       console.log(nodeText)
+       var linkText = JSON.stringify(links)
+       console.log(linkText)
+       var text = nodeText.concat(linkText);
+
+        console.log(text)
+
+        //fileArray = d3.csv.formatRows(text);
+        //console.log(results)
 
 
       }
@@ -3253,7 +3481,7 @@ var slide_17 = d3.select("svg").append("g")
 
 <div class="input-group" display="none" id="userEd" method="get">
   <form id="userEdu">
-    <span class="slideText">What is the highest education that you completed?</span><br><br>
+    <span class="slideText">What is the highest education that you have completed?</span><br><br>
     <input type="radio" class="slideText" name="uEdu" value="less_highschool"><span class="questionText"> Less than high school</span><br>
     <input type="radio" name="uEdu" value="highschool"><span class="questionText"> High school </span><br>
     <input type="radio" name="uEdu" value="college"><span class="questionText"> Some college </span><br>
@@ -3377,6 +3605,22 @@ First name: <input type="text" name="fname"><br>
     top="150px"
     left="100px"/>
 </div>
+
+
+  <?php
+
+  // Open the text file
+  $f = fopen("/data/data.txt", "a");
+
+  // Write text line
+  fwrite($f, linkText); 
+
+
+  // Close the text file
+
+  fclose($f);
+
+  ?>
 
 
   </body>
