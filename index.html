@@ -131,9 +131,9 @@
 
   // for use when pushed to afs space
 //d3.text("/afs/ir.stanford.edu/users/j/h/jhickcox/WWW/SurveyData/data.csv", function(text) {
-d3.text("/data/data.txt", function(text) {
-  fileArray = d3.csv.parseRows(text);
-});
+//d3.text("/data/data.txt", function(text) {
+//  fileArray = d3.csv.parseRows(text);
+//});
 
 
 
@@ -3428,7 +3428,7 @@ var slide_17 = d3.select("svg").append("g")
        // fileArray = d3.csv.formatRows(nodes);
        var nodeText = JSON.stringify(nodes)
        console.log(nodeText)
-       var linkText = JSON.stringify(links)
+       linkText = JSON.stringify(links)
        console.log(linkText)
        var text = nodeText.concat(linkText);
 
@@ -3610,7 +3610,7 @@ First name: <input type="text" name="fname"><br>
   <?php
 
   // Open the text file
-  $f = fopen("http://stanford.edu/~jhickcox/SocialNetworkSurvey/data/data.txt", "a");
+  $f = fopen("data/data.txt", "a");
 
   // Write text line
   fwrite($f, linkText); 
