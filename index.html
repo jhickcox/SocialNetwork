@@ -125,6 +125,8 @@
       node = svg.selectAll(".node"),
       link = svg.selectAll(".link");
 
+  var dataString = "";
+  var infoArray = [];
   var fileArray = [];
   var linkText = 'hello';
 
@@ -1264,6 +1266,10 @@ var slide_17 = d3.select("svg").append("g")
 
   }
 
+  function yearPromptNonresponse() {
+    document.getElementById("badYear_box").style.display = "block";
+    document.getElementById("yearPopup").style.display = "block";
+  }
 
   function friendPromptNonresponse() {
     document.getElementById("fewFriends_box").style.display = "block";
@@ -1280,6 +1286,12 @@ var slide_17 = d3.select("svg").append("g")
 
     document.getElementById("nonresponse_box").style.display = "none";
     document.getElementById("popup").style.display = "none";
+  }
+
+  function closeYearPopup() {
+
+    document.getElementById("badYear_box").style.display = "none";
+    document.getElementById("yearPopup").style.display = "none";
   }
 
   function closeFriendPopup() {
@@ -1423,7 +1435,7 @@ var slide_17 = d3.select("svg").append("g")
       // If user has not selected an option, alert with popup
       if ( !(age >= 1990 && age <= 1997) && checked == false) {
 
-        promptNonresponse();
+        yearPromptNonresponse();
         checked = true;
 
       } else {
@@ -3414,11 +3426,41 @@ var slide_17 = d3.select("svg").append("g")
         var totalTime = (endTime - startTime) / 1000;
         nodes[0].surveyTime = totalTime;
 
+
+        var data = nodes;
+        var csvContent = "data:text/csv;charset=utf-8,";
+        data.forEach(function(infoArray, index){
+          console.log("infoArray: " + infoArray)
+
+          var array = $.map(infoArray, function(value, index) {
+            return [value];
+          });
+          console.log("array: " + array)
+
+
+         dataString = array.join(",");
+         csvContent += index < infoArray.length ? dataString+ "\n" : dataString;
+
+        }); 
+        console.log("csvContent \n" + csvContent)
+
+
+       // var encodedUri = encodeURI(csvContent);
+       // window.open(encodedUri);
+
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "my_data.csv");
+
+        link.click(); // This will download the data file named "my_data.csv".
+
+
         //results.push(nodes);
-        results = nodes;
-        console.log(results);
-        fileArray.push(results);
-        console.log(fileArray);
+        //results = nodes;
+        //console.log(results);
+       // fileArray.push(results);
+       // console.log(fileArray);
         //nodes.forEach(function(n) {
         //  fileArray.push(n);
         //})
@@ -3426,16 +3468,17 @@ var slide_17 = d3.select("svg").append("g")
 
         //var text = d3.csv.formatRows(nodes);
        // fileArray = d3.csv.formatRows(nodes);
-       var nodeText = JSON.stringify(nodes)
+      /* var nodeText = JSON.stringify(nodes)
        console.log(nodeText)
        linkText = JSON.stringify(links)
        console.log(linkText)
        var text = nodeText.concat(linkText);
 
-        console.log(text)
+        console.log(text)*/
 
         //fileArray = d3.csv.formatRows(text);
         //console.log(results)
+
 
 
       }
@@ -3546,6 +3589,13 @@ First name: <input type="text" name="fname"><br>
   </div>
 </div>
 
+<div class="popop_box" id="badYear_box">
+  <div class="popup_box" id="yearPopup">
+        <p class="popup_text">Please enter a year between 1900 and 1997.</p>
+        <button class="btn btn-default" onclick="closeYearPopup()">Close</button>
+  </div>
+</div>
+
 
 <div class="popop_box" id="fewFriends_box">
   <div class="popup_box" id="friendPopup">
@@ -3607,7 +3657,7 @@ First name: <input type="text" name="fname"><br>
 </div>
 
 
-  <?php
+  <!--<?php
 
   // Open the text file
   $f = fopen("data/data.txt", "a");
@@ -3622,7 +3672,7 @@ First name: <input type="text" name="fname"><br>
 
   ?>
 
-<!--  <?php
+ <?php
 $file = 'data/data.txt';
 // Open the file to get existing content
 $current = file_get_contents($file);

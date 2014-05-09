@@ -218,6 +218,19 @@
     background: rgba(0,0,0,0.25);
 }
 
+#badYear_box {
+  display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height:100%;
+    width: 100%;
+    cursor: pointer;
+    z-index: 1000; /* high z-index */
+    background: #000; /* fallback */
+    background: rgba(0,0,0,0.25);
+}
+
 #fewDragged_box {
   display: none;
     position: absolute;
@@ -232,6 +245,20 @@
 }
 
 #popup {
+  display: none;
+  background: #fff;
+  padding: 1%;
+  width: 40%;
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  margin: 0 0 0 -20%; /* add negative left margin for half the width to center the div */
+  cursor: default;
+  border-radius: 3px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.9);
+}
+
+#yearPopup {
   display: none;
   background: #fff;
   padding: 1%;
